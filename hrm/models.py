@@ -5,7 +5,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 import calendar
 
-
+MONTH_CHOICES = (
+    (5, "5"),
+    (6, "6"),
+)
 
 class Job(models.Model):
     name = models.CharField(_('name'), unique=True, max_length=40)
@@ -50,7 +53,7 @@ class Employee(models.Model):
     bank_account_len = models.PositiveIntegerField(default=0)
     social_insurance = models.CharField(max_length=20,default="", blank=True)
     social_insurance_len = models.PositiveIntegerField(default=0)
-    quit = models.BooleanField(default=False)
+    active = models.BooleanField(default=True)
     give_bank_account = models.BooleanField(default=False)
     bank_account_given = models.BooleanField(default=False)
     rest_days = models.IntegerField(
@@ -122,45 +125,49 @@ class Month(models.Model):
     def save(self, *args, **kwargs):
          self.last_day = self.last_day_of_month(self.year,self.month)
          self.weekday = self.get_weekends()
+
          return super(Month, self).save(*args, **kwargs)
 
+    def post_save(self):
+        for e in Employee.objects.filter(active=True):
+            MonthEmployee(month=self)
 
 class MonthEmployee(models.Model):
     month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0)
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
-    day_1 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_2 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_3 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_4 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_5 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_6 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_7 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_8 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_9 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_10 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_11 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_12 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_13 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_14 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_15 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_16 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_17 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_18 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_19 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_20 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_21 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_22 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_23 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_24 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_25 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_26 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_27 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_28 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_29 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_30 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
-    day_31 = models.IntegerField( default=0,validators=[MaxValueValidator(12),MinValueValidator(0)])
+    day_1 = models.BooleanField(default=False)
+    day_2 = models.BooleanField(default=False)
+    day_3 = models.BooleanField(default=False)
+    day_4 = models.BooleanField(default=False)
+    day_5 = models.BooleanField(default=False)
+    day_6 = models.BooleanField(default=False)
+    day_7 = models.BooleanField(default=False)
+    day_8 = models.BooleanField(default=False)
+    day_9 = models.BooleanField(default=False)
+    day_10 = models.BooleanField(default=False)
+    day_11 =  models.BooleanField(default=False)
+    day_12 = models.BooleanField(default=False)
+    day_13 = models.BooleanField(default=False)
+    day_14 = models.BooleanField(default=False)
+    day_15 = models.BooleanField(default=False)
+    day_16 = models.BooleanField(default=False)
+    day_17 = models.BooleanField(default=False)
+    day_18 = models.BooleanField(default=False)
+    day_19 = models.BooleanField(default=False)
+    day_20 = models.BooleanField(default=False)
+    day_21 = models.BooleanField(default=False)
+    day_22 = models.BooleanField(default=False)
+    day_23 = models.BooleanField(default=False)
+    day_24 = models.BooleanField(default=False)
+    day_25 = models.BooleanField(default=False)
+    day_26 = models.BooleanField(default=False)
+    day_27 = models.BooleanField(default=False)
+    day_28 = models.BooleanField(default=False)
+    day_29 = models.BooleanField(default=False)
+    day_30 = models.BooleanField(default=False)
+    day_31 = models.BooleanField(default=False)
 
-    rest = models.FloatField(null=True, blank=True, default=None)
+    rest = models.FloatField(null=True, blank=True, default=0)
 
     salary = models.FloatField(null=True, blank=True, default=None)
 
@@ -168,12 +175,16 @@ class MonthEmployee(models.Model):
 
     hours = models.FloatField(null=True, blank=True, default=None)
 
+
+
+    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES)
+
     def __str__(self):
         return "{} -> {}".format(self.month, self.emp)
 
     def alldays(self):
 
-        alma= self.day_1+self.day_2+self.day_3+self.day_4+self.day_5+self.day_6+\
+        alma = self.day_1+self.day_2+self.day_3+self.day_4+self.day_5+self.day_6+\
                self.day_7+self.day_8+self.day_9+self.day_10+self.day_11+self.day_12+\
                self.day_13+self.day_14+self.day_15+self.day_16+ self.day_17+self.day_18+\
                self.day_19+self.day_20+self.day_21+self.day_22+self.day_23+self.day_24+\
@@ -182,9 +193,9 @@ class MonthEmployee(models.Model):
 
 
     def save(self, *args, **kwargs):
-         self.salary = float(self.alldays())*float(self.emp.salary/self.month.hours)
-         self.hours = float(self.alldays())
-         self.all_amount = self.salary+self.rest
+         self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
+         self.hours = (self.alldays())
+         self.all_amount = float(self.salary)+float(self.rest)
          return super(MonthEmployee, self).save(*args, **kwargs)
 
 
@@ -228,3 +239,4 @@ class Rest(models.Model):
         self.update_sum()
         rest_list = Rest.objects.filter(emp=self.emp).filter(month__year=self.year).update()
         return super(Rest, self).save(*args, **kwargs)
+

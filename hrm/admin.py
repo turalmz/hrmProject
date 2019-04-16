@@ -3,9 +3,9 @@ import csv
 from django.http import HttpResponse
 from .models import *
 
-admin.site.site_header = "UMSRA Admin"
-admin.site.site_title = "UMSRA Admin Portal"
-admin.site.index_title = "Welcome to UMSRA Researcher Portal"
+admin.site.site_header = "ERP Admin"
+admin.site.site_title = "ERP Admin Portal"
+admin.site.index_title = "Welcome to ERP Researcher Portal"
 
 
 
@@ -91,7 +91,15 @@ def has_add_permission(self, request):
 
 
 admin.site.register(Department)
+# admin.site.register(Rest)
 admin.site.register(Job)
+
+
+@admin.register(Rest)
+class RestAdmin(admin.ModelAdmin,ExportCsvMixin):
+    list_display = ("month", "emp","day","sum")
+    readonly_fields=('sum' ,'year', )
+
 
 @admin.register(Month)
 class MonthAdmin(admin.ModelAdmin,ExportCsvMixin):

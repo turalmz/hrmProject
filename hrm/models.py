@@ -23,8 +23,8 @@ class Department(models.Model):
     name = models.CharField(_('name'), unique=True, max_length=40)
 
     class Meta:
-        verbose_name = _('department')
-        verbose_name_plural = _('departments')
+        verbose_name = _('Departament')
+        verbose_name_plural = _('Departamentlər')
         db_table = 'departments'
 
     def __str__(self):
@@ -53,6 +53,13 @@ class Employee(models.Model):
     quit = models.BooleanField(default=False)
     give_bank_account = models.BooleanField(default=False)
     bank_account_given = models.BooleanField(default=False)
+    rest_days = models.IntegerField(
+        default=21,
+        validators=[
+            MaxValueValidator(50),
+            MinValueValidator(1)
+        ]
+     )
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
 
@@ -179,3 +186,45 @@ class MonthEmployee(models.Model):
          self.hours = float(self.alldays())
          self.all_amount = self.salary+self.rest
          return super(MonthEmployee, self).save(*args, **kwargs)
+
+
+class Rest(models.Model):
+    month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0)
+    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
+    day = models.IntegerField( default=0,validators=[MaxValueValidator(55),MinValueValidator(1)])
+    sum = models.IntegerField( default=0,validators=[MaxValueValidator(55),MinValueValidator(1)])
+    year = models.IntegerField( default=0,validators=[MaxValueValidator(2055),MinValueValidator(2001)])
+    extra_money = models.FloatField(null=True, blank=True, default=None)
+
+    class Meta:
+        verbose_name = _('məzuniyyət')
+        verbose_name_plural = _('məzuniyyət')
+
+
+    def __str__(self):
+        return "{} - {}".format(self.month, self.emp)
+
+    def update_sum(self):
+        rest_list = Rest.objects.filter(emp=self.emp).filter(month__year=self.year)
+
+        sum_day = 0
+        if Rest.objects.filter(pk=self.pk).exists():
+            pass
+        else:
+            sum_day = self.day
+
+        for relement in rest_list:
+            sum_day = sum_day+relement.day
+            print(relement.day)
+        self.sum = sum_day
+        # for relement in rest_list:
+        #     sum_day = sum_day+relement.day
+        #     print(relement.day)
+
+        return True
+
+    def save(self, *args, **kwargs):
+        self.year = self.month.year
+        self.update_sum()
+        rest_list = Rest.objects.filter(emp=self.emp).filter(month__year=self.year).update()
+        return super(Rest, self).save(*args, **kwargs)

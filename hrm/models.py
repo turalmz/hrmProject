@@ -14,8 +14,8 @@ class Job(models.Model):
     name = models.CharField(_('name'), unique=True, max_length=40)
 
     class Meta:
-        verbose_name = _('job')
-        verbose_name_plural = _('jobs')
+        verbose_name = _('İş')
+        verbose_name_plural = _('İşlər')
         db_table = 'jobs'
 
     def __str__(self):
@@ -63,6 +63,7 @@ class Employee(models.Model):
             MinValueValidator(1)
         ]
      )
+
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
 
@@ -74,6 +75,10 @@ class Employee(models.Model):
          self.social_insurance_len = len(self.social_insurance)
 
          return super(Employee, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = _('İşçi')
+        verbose_name_plural = _('İşçilər')
 
 
 class Month(models.Model):
@@ -132,6 +137,12 @@ class Month(models.Model):
         for e in Employee.objects.filter(active=True):
             MonthEmployee(month=self)
 
+
+    class Meta:
+        verbose_name = _('Ay')
+        verbose_name_plural = _('Aylar')
+
+
 class MonthEmployee(models.Model):
     month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0)
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
@@ -145,7 +156,7 @@ class MonthEmployee(models.Model):
     day_8 = models.BooleanField(default=False)
     day_9 = models.BooleanField(default=False)
     day_10 = models.BooleanField(default=False)
-    day_11 =  models.BooleanField(default=False)
+    day_11 = models.BooleanField(default=False)
     day_12 = models.BooleanField(default=False)
     day_13 = models.BooleanField(default=False)
     day_14 = models.BooleanField(default=False)
@@ -198,6 +209,10 @@ class MonthEmployee(models.Model):
          self.all_amount = float(self.salary)+float(self.rest)
          return super(MonthEmployee, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name = _('Aylıq')
+        verbose_name_plural = _('Aylıqlar')
+
 
 class Rest(models.Model):
     month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0)
@@ -208,8 +223,8 @@ class Rest(models.Model):
     extra_money = models.FloatField(null=True, blank=True, default=None)
 
     class Meta:
-        verbose_name = _('məzuniyyət')
-        verbose_name_plural = _('məzuniyyət')
+        verbose_name = _('Məzuniyyət')
+        verbose_name_plural = _('Məzuniyyət')
 
 
     def __str__(self):

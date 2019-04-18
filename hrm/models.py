@@ -35,33 +35,36 @@ class Department(models.Model):
 
 
 class Employee(models.Model):
-    first_name = models.CharField(max_length=100)
-    mid_name = models.CharField(max_length=100,default="",blank=True)
-    last_name = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=100, verbose_name ='Ad')
+    mid_name = models.CharField(max_length=100,default="",blank=True, verbose_name ='Ata adı')
+    last_name = models.CharField(max_length=100, verbose_name ='Soyad')
     hire_date = models.DateField(_('hire date'))
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
     salary = models.IntegerField(_('salary'),default=0)
-    fin = models.CharField(max_length=12,default="", blank=True)
-    passport = models.CharField(max_length=12,default="", blank=True)
-    bank_account = models.CharField(max_length=16,default="not", blank=True)
-    phone = models.CharField(max_length=20,default="", blank=True)
-    address = models.CharField(max_length=20,default="", blank=True)
+    fin = models.CharField(max_length=12,default="", blank=Trueç, verbose_name ='Fin')
+    passport = models.CharField(max_length=12,default="", blank=Trueç, verbose_name ='Passport nömrəsi')
+    bank_account = models.CharField(max_length=16,default="not", blank=True, verbose_name ='Bank nömrəsi')
+    phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
+    home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
+    address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
-    manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE,  verbose_name=_('job'),blank=True,default=0)
-    bank_account_len = models.PositiveIntegerField(default=0)
-    social_insurance = models.CharField(max_length=20,default="", blank=True)
+    manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,  verbose_name=_('job'),blank=True,default=0, verbose_name ='İşi')
+    bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
+    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
     social_insurance_len = models.PositiveIntegerField(default=0)
-    active = models.BooleanField(default=True)
-    give_bank_account = models.BooleanField(default=False)
-    bank_account_given = models.BooleanField(default=False)
+    active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
+    give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    bank_account_given = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
+
     rest_days = models.IntegerField(
         default=21,
         validators=[
             MaxValueValidator(50),
             MinValueValidator(1)
-        ]
+        ], verbose_name = 'Məzuniyyət günü sayı'
      )
 
     def __str__(self):
@@ -87,21 +90,21 @@ class Month(models.Model):
         validators=[
             MaxValueValidator(12),
             MinValueValidator(1)
-        ]
+        ], verbose_name = 'Ay'
      )
     year = models.IntegerField(
         default=2019,
         validators=[
             MaxValueValidator(2050),
             MinValueValidator(2010)
-        ]
+        ], verbose_name = 'İl'
     )
     last_day = models.IntegerField(
         default=1,
         validators=[
             MaxValueValidator(31),
             MinValueValidator(28)
-        ]
+        ], verbose_name = 'Ayın son günü'
      )
 
     hours = models.IntegerField(
@@ -109,10 +112,10 @@ class Month(models.Model):
         validators=[
             MaxValueValidator(210),
             MinValueValidator(10)
-        ]
+        ], verbose_name = 'Aylıq iş norması'
      )
 
-    weekday = models.PositiveIntegerField(default=0)
+    weekday = models.PositiveIntegerField(default=0, verbose_name = 'Ayın ilk günü həftənin hansı günüdür')
 
     def __str__(self):
         return "{} / {} / {}".format(self.month, self.year,self.last_day)
@@ -144,8 +147,8 @@ class Month(models.Model):
 
 
 class MonthEmployee(models.Model):
-    month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0)
-    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
+    month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0, verbose_name = 'Ay')
+    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0 verbose_name = 'İşçi')
     day_1 = models.BooleanField(default=False)
     day_2 = models.BooleanField(default=False)
     day_3 = models.BooleanField(default=False)
@@ -178,17 +181,14 @@ class MonthEmployee(models.Model):
     day_30 = models.BooleanField(default=False)
     day_31 = models.BooleanField(default=False)
 
-    rest = models.FloatField(null=True, blank=True, default=0)
+    rest = models.FloatField(null=True, blank=True, default=0 ,verbose_name = 'Bu ay ərzində alınan məzuniyyət')
 
-    salary = models.FloatField(null=True, blank=True, default=None)
+    salary = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin maaşı')
 
-    all_amount = models.FloatField(null=True, blank=True, default=None)
+    all_amount = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin maaşı(məzuniyyət daxil)')
 
-    hours = models.FloatField(null=True, blank=True, default=None)
+    hours = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin işlədiyi saat')
 
-
-
-    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES)
 
     def __str__(self):
         return "{} -> {}".format(self.month, self.emp)
@@ -255,3 +255,41 @@ class Rest(models.Model):
         rest_list = Rest.objects.filter(emp=self.emp).filter(month__year=self.year).update()
         return super(Rest, self).save(*args, **kwargs)
 
+
+class Holiday(models.Model):
+    month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0)
+    day_1 = models.BooleanField(default=False)
+    day_2 = models.BooleanField(default=False)
+    day_3 = models.BooleanField(default=False)
+    day_4 = models.BooleanField(default=False)
+    day_5 = models.BooleanField(default=False)
+    day_6 = models.BooleanField(default=False)
+    day_7 = models.BooleanField(default=False)
+    day_8 = models.BooleanField(default=False)
+    day_9 = models.BooleanField(default=False)
+    day_10 = models.BooleanField(default=False)
+    day_11 = models.BooleanField(default=False)
+    day_12 = models.BooleanField(default=False)
+    day_13 = models.BooleanField(default=False)
+    day_14 = models.BooleanField(default=False)
+    day_15 = models.BooleanField(default=False)
+    day_16 = models.BooleanField(default=False)
+    day_17 = models.BooleanField(default=False)
+    day_18 = models.BooleanField(default=False)
+    day_19 = models.BooleanField(default=False)
+    day_20 = models.BooleanField(default=False)
+    day_21 = models.BooleanField(default=False)
+    day_22 = models.BooleanField(default=False)
+    day_23 = models.BooleanField(default=False)
+    day_24 = models.BooleanField(default=False)
+    day_25 = models.BooleanField(default=False)
+    day_26 = models.BooleanField(default=False)
+    day_27 = models.BooleanField(default=False)
+    day_28 = models.BooleanField(default=False)
+    day_29 = models.BooleanField(default=False)
+    day_30 = models.BooleanField(default=False)
+    day_31 = models.BooleanField(default=False)
+
+
+    
+    

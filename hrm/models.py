@@ -42,15 +42,15 @@ class Employee(models.Model):
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
     salary = models.IntegerField(_('salary'),default=0)
-    fin = models.CharField(max_length=12,default="", blank=Trueç, verbose_name ='Fin')
-    passport = models.CharField(max_length=12,default="", blank=Trueç, verbose_name ='Passport nömrəsi')
+    fin = models.CharField(max_length=12,default="", blank=True, verbose_name ='Fin')
+    passport = models.CharField(max_length=12,default="", blank=True, verbose_name ='Passport nömrəsi')
     bank_account = models.CharField(max_length=16,default="not", blank=True, verbose_name ='Bank nömrəsi')
     phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
     home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
     address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
     manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
-    job = models.ForeignKey(Job, on_delete=models.CASCADE,  verbose_name=_('job'),blank=True,default=0, verbose_name ='İşi')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
     bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
     social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
     social_insurance_len = models.PositiveIntegerField(default=0)
@@ -147,8 +147,8 @@ class Month(models.Model):
 
 
 class MonthEmployee(models.Model):
-    month = models.ForeignKey(Month, on_delete=models.CASCADE, verbose_name=_('month'),blank=True,default=0, verbose_name = 'Ay')
-    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0 verbose_name = 'İşçi')
+    month = models.ForeignKey(Month, on_delete=models.CASCADE,blank=True,default=0, verbose_name = 'Ay')
+    emp = models.ForeignKey(Employee, on_delete=models.CASCADE,blank=True,default=0 ,verbose_name = 'İşçi')
     day_1 = models.BooleanField(default=False)
     day_2 = models.BooleanField(default=False)
     day_3 = models.BooleanField(default=False)
@@ -291,5 +291,3 @@ class Holiday(models.Model):
     day_31 = models.BooleanField(default=False)
 
 
-    
-    

@@ -291,3 +291,69 @@ class Holiday(models.Model):
     day_31 = models.BooleanField(default=False)
 
 
+class InsuranceEmployee(models.Model):
+    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
+    first_name = models.CharField(max_length=100, verbose_name ='Ad')
+    mid_name = models.CharField(max_length=100,default="",blank=True, verbose_name ='Ata adı')
+    last_name = models.CharField(max_length=100, verbose_name ='Soyad')
+    hire_date = models.DateField(_('hire date'))
+    birth_date = models.DateField(_('birthday'))
+    quit_date = models.DateField(_('quit date'),blank=True, null=True)
+    salary = models.IntegerField(_('salary'),default=0)
+    fin = models.CharField(max_length=12,default="", blank=True, verbose_name ='Fin')
+    passport = models.CharField(max_length=12,default="", blank=True, verbose_name ='Passport nömrəsi')
+    bank_account = models.CharField(max_length=16,default="not", blank=True, verbose_name ='Bank nömrəsi')
+    phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
+    home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
+    address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
+    manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
+    bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
+    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
+    social_insurance_len = models.PositiveIntegerField(default=0)
+    active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
+    give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    bank_account_given = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
+
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    class Meta:
+        verbose_name = _('Sığorta İşçi')
+        verbose_name_plural = _('Sığorta İşçilər')
+
+
+class BankCardEmployee(models.Model):
+    emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
+    first_name = models.CharField(max_length=100, verbose_name ='Ad')
+    mid_name = models.CharField(max_length=100,default="",blank=True, verbose_name ='Ata adı')
+    last_name = models.CharField(max_length=100, verbose_name ='Soyad')
+    hire_date = models.DateField(_('hire date'))
+    birth_date = models.DateField(_('birthday'))
+    quit_date = models.DateField(_('quit date'),blank=True, null=True)
+    salary = models.IntegerField(_('salary'),default=0)
+    fin = models.CharField(max_length=12,default="", blank=True, verbose_name ='Fin')
+    passport = models.CharField(max_length=12,default="", blank=True, verbose_name ='Passport nömrəsi')
+    bank_account = models.CharField(max_length=16,default="not", blank=True, verbose_name ='Bank nömrəsi')
+    phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
+    home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
+    address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
+    manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
+    bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
+    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
+    social_insurance_len = models.PositiveIntegerField(default=0)
+    active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
+    give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    bank_account_given = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
+
+    def __str__(self):
+        return "{} {}".format(self.first_name, self.last_name)
+
+    class Meta:
+        verbose_name = _('Bank İşçi')
+        verbose_name_plural = _('Bank İşçilər')

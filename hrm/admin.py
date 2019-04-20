@@ -138,6 +138,22 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
              'all': ('css/script.css',)
         }
 
-# @receiver(post_save, sender=User)
-# def save_user_profile(sender, instance, **kwargs):
-#     print('_-----')
+        
+        
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    print('_-----')
+
+    
+@receiver(post_save, sender=Employee)
+def save_user_profile(sender, instance, **kwargs):
+    if instance.give_bank_account  == True:
+        BankCardEmployee(emp=instance)
+    print('_-----')
+ 
+
+@receiver(post_save, sender=Employee)
+def save_user_profile(sender, instance, **kwargs):
+    if instance.insurance == True:
+        InsuranceEmployee(emp=instance)
+    print('_-----')

@@ -56,7 +56,7 @@ class Employee(models.Model):
     social_insurance_len = models.PositiveIntegerField(default=0)
     active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
-    bank_account_given = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+    give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
     day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
 
     rest_days = models.IntegerField(
@@ -314,7 +314,8 @@ class InsuranceEmployee(models.Model):
     social_insurance_len = models.PositiveIntegerField(default=0)
     active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
-    bank_account_given = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+
+    give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
     day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
 
     def __str__(self):
@@ -348,7 +349,9 @@ class BankCardEmployee(models.Model):
     social_insurance_len = models.PositiveIntegerField(default=0)
     active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
-    bank_account_given = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
+
+    give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
+    
     day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
 
     def __str__(self):

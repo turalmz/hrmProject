@@ -146,14 +146,24 @@ def save_user_profile(sender, instance, **kwargs):
 
     
 @receiver(post_save, sender=Employee)
-def save_user_profile(sender, instance, **kwargs):
+def save_emp1(sender, instance, **kwargs):
     if instance.give_bank_account  == True:
-        BankCardEmployee(emp=instance)
-    print('_-----')
+        if BankCardEmployee.objects.filter(emp=instance).exists():
+            pass
+        else:
+            b = BankCardEmployee(emp=instance)
+            b.save()
+            print('__added')
  
 
 @receiver(post_save, sender=Employee)
-def save_user_profile(sender, instance, **kwargs):
+def save_emp2(sender, instance, **kwargs):
     if instance.insurance == True:
-        InsuranceEmployee(emp=instance)
+        if InsuranceEmployee.objects.filter(emp=instance).exists():
+            pass
+        else:
+            b = InsuranceEmployee(emp=instance)
+            b.save()
+            print('_added')
+        
     print('_-----')

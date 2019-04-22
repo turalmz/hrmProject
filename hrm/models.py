@@ -324,7 +324,25 @@ class InsuranceEmployee(models.Model):
     class Meta:
         verbose_name = _('Sığorta İşçi')
         verbose_name_plural = _('Sığorta İşçilər')
-
+        
+    def save(self, *args, **kwargs):
+        self.first_name = self.emp.first_name
+        self.mid_name = self.emp.mid_name
+        self.last_name = self.emp.last_name
+        self.hire_date = self.emp.hire_date
+        self.birth_date = self.emp.birth_date
+        self.quit_date = self.emp.quit_date
+        self.salary = self.emp.salary
+        self.fin = self.emp.fin
+        self.passport = self.emp.passport
+        self.bank_account = self.emp.bank_account
+        self.phone = self.emp.phone
+        self.home_phone = self.emp.home_phone
+        self.address = self.emp.address
+        self.job = self.emp.job
+        self.social_insurance = self.emp.social_insurance
+        self.active = self.emp.active
+        return super(InsuranceEmployee, self).save(*args, **kwargs)
 
 class BankCardEmployee(models.Model):
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
@@ -360,3 +378,23 @@ class BankCardEmployee(models.Model):
     class Meta:
         verbose_name = _('Bank İşçi')
         verbose_name_plural = _('Bank İşçilər')
+
+        
+    def save(self, *args, **kwargs):
+        self.first_name = self.emp.first_name
+        self.mid_name = self.emp.mid_name
+        self.last_name = self.emp.last_name
+        self.hire_date = self.emp.hire_date
+        self.birth_date = self.emp.birth_date
+        self.quit_date = self.emp.quit_date
+        self.salary = self.emp.salary
+        self.fin = self.emp.fin
+        self.passport = self.emp.passport
+        self.bank_account = self.emp.bank_account
+        self.phone = self.emp.phone
+        self.home_phone = self.emp.home_phone
+        self.address = self.emp.address
+        self.job = self.emp.job
+        self.social_insurance = self.emp.social_insurance
+        self.active = self.emp.active
+        return super(BankCardEmployee, self).save(*args, **kwargs)

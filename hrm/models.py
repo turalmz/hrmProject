@@ -205,7 +205,11 @@ class MonthEmployee(models.Model):
 
     def save(self, *args, **kwargs):
          self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
-         self.hours = (self.alldays())
+         if self.emp.day==5:
+            self.hours = (self.alldays())*8
+         elif self.emp.day==6:
+            self.hours = (self.alldays())*7
+            
          self.all_amount = float(self.salary)+float(self.rest)
          return super(MonthEmployee, self).save(*args, **kwargs)
 

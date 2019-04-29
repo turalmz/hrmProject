@@ -309,15 +309,11 @@ class InsuranceEmployee(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
     manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
-    bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
     social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
-    social_insurance_len = models.PositiveIntegerField(default=0)
-    active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
 
     give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
-    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
-
+    
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)
 
@@ -362,15 +358,10 @@ class BankCardEmployee(models.Model):
     department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
     manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
-    bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
     social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
-    social_insurance_len = models.PositiveIntegerField(default=0)
-    active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
 
     give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
-    
-    day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
 
     def __str__(self):
         return "{} {}".format(self.first_name, self.last_name)

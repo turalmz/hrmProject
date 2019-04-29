@@ -95,10 +95,48 @@ admin.site.register(Department)
 admin.site.register(Job)
 
 
+@admin.register(BankCardEmployee)
+class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
+    list_display = ("first_name","last_name", "job","department")
+    actions = ["export_as_csv"]
+    list_per_page = 100
+
+    list_filter = ("department","job",IsInsuranceFilter,IsCardFilter)
+
+    def is_card(self, obj):
+        return obj.bank_account_len == 16
+
+    is_card.boolean = True
+
+    def is_insurance(self, obj):
+        return obj.social_insurance == 20
+
+    is_insurance.boolean = True
+
+
+@admin.register(InsuranceEmployee)
+class InsuranceEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
+    list_display = ("first_name","last_name", "job","department")
+    actions = ["export_as_csv"]
+    list_per_page = 100
+
+    list_filter = ("department","job",IsInsuranceFilter,IsCardFilter)
+
+    def is_card(self, obj):
+        return obj.bank_account_len == 16
+
+    is_card.boolean = True
+
+    def is_insurance(self, obj):
+        return obj.social_insurance == 20
+
+    is_insurance.boolean = True
+
+
 @admin.register(Rest)
 class RestAdmin(admin.ModelAdmin,ExportCsvMixin):
     list_display = ("month", "emp","day","sum")
-    readonly_fields=('sum' ,'year', )
+    readonly_fields = ('sum','year', )
 
 
 @admin.register(Month)
@@ -106,7 +144,7 @@ class MonthAdmin(admin.ModelAdmin,ExportCsvMixin):
     list_display = ("month", "year","last_day")
     actions = ["export_as_csv"]
     list_per_page = 100
-    readonly_fields=('last_day','weekday' )
+    readonly_fields = ('last_day','weekday')
 
 
 @admin.register(MonthEmployee)
@@ -139,10 +177,9 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
         }
 
         
-        
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    print('_-----')
+from django.dispatch import receiver
+from django.db.models.signals import post_save
+
 
     
 @receiver(post_save, sender=Employee)
@@ -166,4 +203,26 @@ def save_emp2(sender, instance, **kwargs):
             b.save()
             print('_added')
         
+    print('_-----')
+
+
+@receiver(post_save, sender=InsuranceEmployee)
+def save_inemp(sender, instance, **kwargs):
+    if Employee.objects.filter(pk=instance.emp.pk).exists():
+        b = Employee.objects.first(pk=instance.emp.pk)
+        b.give_insurance_account = instance.give_insurance_account
+        b.save()
+        print('_added')
+
+    print('_-----')
+
+
+@receiver(post_save, sender=BankCardEmployee)
+def save_baemp(sender, instance, **kwargs):
+    if Employee.objects.filter(pk=instance.emp.pk).exists():
+        b = Employee.objects.first(pk=instance.emp.pk)
+        b.give_bank_account = instance.give_bank_account
+        b.save()
+        print('_added')
+
     print('_-----')

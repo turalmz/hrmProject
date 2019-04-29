@@ -201,11 +201,29 @@ class MonthEmployee(models.Model):
                self.day_19+self.day_20+self.day_21+self.day_22+self.day_23+self.day_24+\
                self.day_25+self.day_26+self.day_27+self.day_28+self.day_29+self.day_30+self.day_31
         return alma
-
-
+    
+    def is_sunday(self,day):
+        if 7==datetime.date(self.month.year, self.month.mon, day).isoweekday()):
+            return True
+        return False
+    
+    def is_saturday(self,day):
+        if 6==datetime.date(self.month.year, self.month.mon, day).isoweekday()):
+            return True
+        return False
+    
+      def is_weekday(self,day):
+        if 6>datetime.date(self.month.year, self.month.mon, day).isoweekday()):
+            return True
+        return False  
+    
     def save(self, *args, **kwargs):
          self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
-         self.hours = (self.alldays())
+         if self.emp.day==5:
+            self.hours = (self.alldays())*8
+         elif self.emp.day==6:
+            self.hours = (self.alldays())*7
+            
          self.all_amount = float(self.salary)+float(self.rest)
          return super(MonthEmployee, self).save(*args, **kwargs)
 

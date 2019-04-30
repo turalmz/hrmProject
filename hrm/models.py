@@ -286,18 +286,18 @@ class MonthEmployee(models.Model):
             return True
         return False
     
-    def get_day_hour(self):
-        if self.is_saturday(self):
+    def get_day_hour(self,day):
+        if self.is_saturday(self,day):
             if self.emp.day==6:
                 return 5
             else:
                 return 8
-        elif self.is_weekday(self):
+        elif self.is_weekday(self,day):
             if self.emp.day==6:
                 return 7
             else:
                 return 8
-        elif self.is_sunday(self):
+        elif self.is_sunday(self,day):
             if self.emp.day==6:
                 return 7
             else:
@@ -306,8 +306,16 @@ class MonthEmployee(models.Model):
             return 0
     
     def get_holidays(self):
-        Holiday.objects.filter(mon=self.month)
+        hol = Holiday.objects.first(mon=self.month)
+        hours = hol.get_holidays(hol,self.emp)
+        return hours
 
+    def get_hol_hours(self, hol):
+        sum_day_hours = 0.0
+        for day in range(1, 31):
+            sum_day_hours = sum_day_hours + self.get_day_hour()
+
+        return sum_day_hours
 
     def save(self, *args, **kwargs):
         self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
@@ -404,6 +412,60 @@ class Holiday(models.Model):
                self.day_19+self.day_20+self.day_21+self.day_22+self.day_23+self.day_24+\
                self.day_25+self.day_26+self.day_27+self.day_28+self.day_29+self.day_30+self.day_31
         return alma
+
+    def get_day_hours(self, day):
+        sum_day_hours = 0.0
+        for day in range(1, 31):
+            sum_day_hours = sum_day_hours + self.get_day_hour()
+
+        return sum_day_hours
+
+    def is_sunday(self, day):
+        if (7 == datetime.date(self.month.year, self.month.mon, day).isoweekday()):
+            return True
+        return False
+
+    def is_saturday(self, day):
+        if (6 == datetime.date(self.month.year, self.month.mon, day).isoweekday()):
+            return True
+        return False
+
+    def is_weekday(self, day):
+        if (6 > datetime.date(self.month.year, self.month.mon, day).isoweekday()):
+            return True
+        return False
+
+    def get_day_hour(self, emp,day):
+        if self.is_saturday(self, day):
+            if emp.day == 6:
+                return 5
+            else:
+                return 8
+        elif self.is_weekday(self, day):
+            if emp.day == 6:
+                return 7
+            else:
+                return 8
+        elif self.is_sunday(self, day):
+            if emp.day == 6:
+                return 7
+            else:
+                return 8
+        else:
+            return 0
+
+    def get_holidays(self,emp):
+        hours = self.get_hol_hours(self,emp)
+
+        return hours
+
+    def get_hol_hours(self,emp):
+        sum_day_hours = 0.0
+        for day in range(1, 31):
+            sum_day_hours = sum_day_hours + self.get_day_hour(emp,day)
+
+        return sum_day_hours
+
 
 class InsuranceEmployee(models.Model):
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)

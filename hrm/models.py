@@ -10,6 +10,75 @@ MONTH_CHOICES = (
     (6, "6"),
 )
 
+
+def get_hour(self,day):
+    if day==1:
+        return self.day_1
+    elif day==2:
+        return self.day_2
+    elif day==3:
+        return self.day_3
+    elif day==4:
+        return self.day_4
+    elif day==5:
+        return self.day_5
+    elif day==6:
+        return self.day_6   
+    elif day==7:
+        return self.day_7
+    elif day==8:
+        return self.day_8
+    elif day==9:
+        return self.day_9
+    elif day==10:
+        return self.day_10
+    elif day==11:
+        return self.day_11
+    elif day==12:
+        return self.day_12
+    elif day==13:
+        return self.day_13
+    elif day==14:
+        return self.day_14
+    elif day==15:
+        return self.day_15
+    elif day==16:
+        return self.day_16
+    elif day==17:
+        return self.day_17
+    elif day==18:
+        return self.day_18    
+    elif day==19:
+        return self.day_19
+    elif day==20:
+        return self.day_20
+    elif day==21:
+        return self.day_21
+    elif day==22:
+        return self.day_22
+    elif day==23:
+        return self.day_23
+    elif day==24:
+        return self.day_24 
+    elif day==25:
+        return self.day_25
+    elif day==26:
+        return self.day_26  
+    elif day==27:
+        return self.day_27
+    elif day==28:
+        return self.day_28
+    elif day==29:
+        return self.day_29
+    elif day==30:
+        return self.day_30
+    elif day==31:
+        return self.day_31
+    else:
+        return 0
+    
+    
+
 class Job(models.Model):
     name = models.CharField(_('name'), unique=True, max_length=40)
 

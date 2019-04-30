@@ -287,6 +287,26 @@ class MonthEmployee(models.Model):
             return True
         return False
     
+    def get_day_hour(self):
+        if is_saturday(self):
+            if self.emp.day==6:
+                return 5
+            else:
+                return 8
+        elif is_weekday(self):
+            if self.emp.day==6:
+                return 7
+            else:
+                return 8
+        elif is_sunday(self):
+            if self.emp.day==6:
+                return 7
+            else:
+                return 8
+        else:
+            return 0
+    
+    
     def save(self, *args, **kwargs):
          self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
          if self.emp.day==5:

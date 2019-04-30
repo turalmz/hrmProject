@@ -262,15 +262,14 @@ class MonthEmployee(models.Model):
     def __str__(self):
         return "{} -> {}".format(self.month, self.emp)
 
-    def alldays(self):
+    def get_day_hours(self, day):
+        sum_day_hours=0.0
+        for day in range(1, 31):
+            sum_day_hours = sum_day_hours+self.get_day_hour()
 
-        alma = self.day_1+self.day_2+self.day_3+self.day_4+self.day_5+self.day_6+\
-               self.day_7+self.day_8+self.day_9+self.day_10+self.day_11+self.day_12+\
-               self.day_13+self.day_14+self.day_15+self.day_16+ self.day_17+self.day_18+\
-               self.day_19+self.day_20+self.day_21+self.day_22+self.day_23+self.day_24+\
-               self.day_25+self.day_26+self.day_27+self.day_28+self.day_29+self.day_30+self.day_31
-        return alma
-    
+        return sum_day_hours
+
+
     def is_sunday(self,day):
         if (7==datetime.date(self.month.year, self.month.mon, day).isoweekday()):
             return True
@@ -288,17 +287,17 @@ class MonthEmployee(models.Model):
         return False
     
     def get_day_hour(self):
-        if is_saturday(self):
+        if self.is_saturday(self):
             if self.emp.day==6:
                 return 5
             else:
                 return 8
-        elif is_weekday(self):
+        elif self.is_weekday(self):
             if self.emp.day==6:
                 return 7
             else:
                 return 8
-        elif is_sunday(self):
+        elif self.is_sunday(self):
             if self.emp.day==6:
                 return 7
             else:
@@ -306,16 +305,15 @@ class MonthEmployee(models.Model):
         else:
             return 0
     
-    
+    def get_holidays(self):
+        Holiday.objects.filter(mon=self.month)
+
+
     def save(self, *args, **kwargs):
-         self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
-         if self.emp.day==5:
-            self.hours = (self.alldays())*8
-         elif self.emp.day==6:
-            self.hours = (self.alldays())*7
-            
-         self.all_amount = float(self.salary)+float(self.rest)
-         return super(MonthEmployee, self).save(*args, **kwargs)
+        self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
+        self.hours = (self.alldays())
+        self.all_amount = float(self.salary)+float(self.rest)
+        return super(MonthEmployee, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _('Aylıq')
@@ -398,6 +396,14 @@ class Holiday(models.Model):
     day_30 = models.BooleanField(default=False)
     day_31 = models.BooleanField(default=False)
 
+    def alldays(self):
+
+        alma = self.day_1+self.day_2+self.day_3+self.day_4+self.day_5+self.day_6+\
+               self.day_7+self.day_8+self.day_9+self.day_10+self.day_11+self.day_12+\
+               self.day_13+self.day_14+self.day_15+self.day_16+ self.day_17+self.day_18+\
+               self.day_19+self.day_20+self.day_21+self.day_22+self.day_23+self.day_24+\
+               self.day_25+self.day_26+self.day_27+self.day_28+self.day_29+self.day_30+self.day_31
+        return alma
 
 class InsuranceEmployee(models.Model):
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)

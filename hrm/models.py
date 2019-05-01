@@ -199,6 +199,13 @@ class Month(models.Model):
 
         return get_day
 
+
+    def get_weekday(self):
+
+
+        return self.weekday
+
+
     def save(self, *args, **kwargs):
          self.last_day = self.last_day_of_month(self.year,self.month)
          self.weekday = self.get_weekends()
@@ -259,45 +266,59 @@ class MonthEmployee(models.Model):
     hours = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin işlədiyi saat')
 
 
+    def get_weekday(self):
+
+        return self.month.weekday
+
     def __str__(self):
         return "{} -> {}".format(self.month, self.emp)
 
-    def get_day_hours(self, day):
+    def get_day_hours(self):
         sum_day_hours=0.0
         for day in range(1, 31):
-            sum_day_hours = sum_day_hours+self.get_day_hour()
+            sum_day_hours = sum_day_hours+self.get_day_hour(day)
 
         return sum_day_hours
 
 
     def is_sunday(self,day):
-        if (7==datetime.date(self.month.year, self.month.mon, day).isoweekday()):
-            return True
+        try:
+            if (7==datetime.date(self.month.year, self.month.month, day).isoweekday()):
+                return True
+        except:
+            return False
         return False
 
 
     def is_saturday(self,day):
-        if (6==datetime.date(self.month.year, self.month.mon, day).isoweekday()):
-            return True
+        try:
+            if (6==datetime.date(self.month.year, self.month.month, day).isoweekday()):
+                return True
+        except:
+            False
+
         return False
 
     def is_weekday(self,day):
-        if (6>datetime.date(self.month.year, self.month.mon, day).isoweekday()):
-            return True
+        try:
+            if (6>datetime.date(self.month.year, self.month.month, day).isoweekday()):
+                return True
+        except:
+            return False
         return False
     
     def get_day_hour(self,day):
-        if self.is_saturday(self,day):
+        if self.is_saturday(day):
             if self.emp.day==6:
                 return 5
             else:
                 return 8
-        elif self.is_weekday(self,day):
+        elif self.is_weekday(day):
             if self.emp.day==6:
                 return 7
             else:
                 return 8
-        elif self.is_sunday(self,day):
+        elif self.is_sunday(day):
             if self.emp.day==6:
                 return 7
             else:
@@ -313,13 +334,13 @@ class MonthEmployee(models.Model):
     def get_hol_hours(self, hol):
         sum_day_hours = 0.0
         for day in range(1, 31):
-            sum_day_hours = sum_day_hours + self.get_day_hour()
+            sum_day_hours = sum_day_hours + self.get_day_hour(day)
 
         return sum_day_hours
 
     def save(self, *args, **kwargs):
-        self.salary = (self.alldays())*float(self.emp.salary/self.month.hours)
-        self.hours = (self.alldays())
+        self.salary = (self.get_day_hours())*float(self.emp.salary/self.month.hours)
+        self.hours = (self.get_day_hours())
         self.all_amount = float(self.salary)+float(self.rest)
         return super(MonthEmployee, self).save(*args, **kwargs)
 
@@ -413,26 +434,36 @@ class Holiday(models.Model):
                self.day_25+self.day_26+self.day_27+self.day_28+self.day_29+self.day_30+self.day_31
         return alma
 
-    def get_day_hours(self, day):
+    def get_day_hours(self):
         sum_day_hours = 0.0
         for day in range(1, 31):
-            sum_day_hours = sum_day_hours + self.get_day_hour()
+            sum_day_hours = sum_day_hours + self.get_day_hour(day)
 
         return sum_day_hours
 
     def is_sunday(self, day):
-        if (7 == datetime.date(self.month.year, self.month.mon, day).isoweekday()):
-            return True
+        try:
+            if (7 == datetime.date(self.month.year, self.month.month, day).isoweekday()):
+                return True
+        except:
+            return False
         return False
 
     def is_saturday(self, day):
-        if (6 == datetime.date(self.month.year, self.month.mon, day).isoweekday()):
-            return True
+        try:
+            if (6 == datetime.date(self.month.year, self.month.month, day).isoweekday()):
+                return True
+        except:
+            False
+
         return False
 
     def is_weekday(self, day):
-        if (6 > datetime.date(self.month.year, self.month.mon, day).isoweekday()):
-            return True
+        try:
+            if (6 > datetime.date(self.month.year, self.month.month, day).isoweekday()):
+                return True
+        except:
+            return False
         return False
 
     def get_day_hour(self, emp,day):

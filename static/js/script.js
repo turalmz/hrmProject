@@ -17,6 +17,11 @@ for(var i = 0; i < table.tBodies.length; i++) {
     console.log(row);
     for (var k = 0; k < row.cells.length; k++) {
       var cell = row.cells[k];
+      if (cell.className =="field-get_weekday"){
+
+          console.log(cell.value);
+          console.log("yes");
+      }
       console.log(cell);
     }
   }

@@ -37,6 +37,14 @@ console.log(trs[i]);
 }
 
 
+function isSunday(day, sunday) {
+ 
+ if(day==sunday||day==sunday+7||day=sunday+14||sunday+21){
+    return True;
+ }
+  return False;
+}
+
 /*
 for(var i=1; i<=31; i++) {
 

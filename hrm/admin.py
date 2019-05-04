@@ -12,9 +12,12 @@ admin.site.site_title = "ERP Admin Portal"
 admin.site.index_title = "Welcome to ERP Researcher Portal"
 
 
-class CsvImportForm(forms.Form):
+class CsvOrExcelImportForm(forms.Form):
     csv_file = forms.FileField()
 
+
+class ExcelImportForm(forms.Form):
+    excel_file = forms.FileField()
 
 
 class ExportCsvMixin():
@@ -167,6 +170,8 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                     "day_20","day_21","day_22","day_23","day_24","day_25","day_26","day_27","day_28","day_29",
                     "day_30", "day_31",)
 
+    change_list_template = "hrm/employee_changelist.html"
+
     list_filter = ("month","emp__job")
     actions = ["export_as_csv"]
 
@@ -184,6 +189,17 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
              'all': ('css/script.css',)
         }
 
+    def get_urls(self):
+        urls = super().get_urls()
+        from django.urls import path
+
+        my_urls = [
+            path('import-csv/', self.import_csv),
+            path('import-excel/', self.import_excel),
+
+        ]
+        return my_urls + urls
+
     def import_csv(self, request):
         if request.method == "POST":
             csv_file = request.FILES["csv_file"]
@@ -191,12 +207,51 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
 
             self.message_user(request, "Your csv file has been imported")
+
+
             return redirect("..")
-        form = CsvImportForm()
+        form = CsvOrExcelImportForm()
         payload = {"form": form}
         return render(
             request, "admin/csv_form.html", payload
         )
+
+    def import_excel(self, request):
+        if request.method == "POST":
+            excel_file = request.FILES["excel_file"]
+            reader = csv.reader(excel_file)
+
+            import openpyxl
+            # you may put validations here to check extension or file size
+
+            wb = openpyxl.load_workbook(excel_file)
+
+            # getting a particular sheet by name out of many sheets
+            worksheet = wb["Sheet1"]
+            print(worksheet)
+
+            excel_data = list()
+            # iterating over the rows and
+            # getting value from each cell in row
+            for row in worksheet.iter_rows():
+                row_data = list()
+                for cell in row:
+                    row_data.append(str(cell.value))
+                excel_data.append(row_data)
+
+
+            self.message_user(request, "Your csv file has been imported")
+
+
+            return redirect("..")
+
+
+        form = ExcelImportForm()
+        payload = {"form": form}
+        return render(
+            request, "admin/excel_form.html", payload
+        )
+
 
 
 from django.dispatch import receiver

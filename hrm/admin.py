@@ -2,10 +2,18 @@ from django.contrib import admin
 import csv
 from django.http import HttpResponse
 from .models import *
+from django import forms
+from django.shortcuts import redirect
+from django.shortcuts import render
+
 
 admin.site.site_header = "ERP Admin"
 admin.site.site_title = "ERP Admin Portal"
 admin.site.index_title = "Welcome to ERP Researcher Portal"
+
+
+class CsvImportForm(forms.Form):
+    csv_file = forms.FileField()
 
 
 
@@ -176,7 +184,21 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
              'all': ('css/script.css',)
         }
 
-        
+    def import_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            reader = csv.reader(csv_file)
+
+
+            self.message_user(request, "Your csv file has been imported")
+            return redirect("..")
+        form = CsvImportForm()
+        payload = {"form": form}
+        return render(
+            request, "admin/csv_form.html", payload
+        )
+
+
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 

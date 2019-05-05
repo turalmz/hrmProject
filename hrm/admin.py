@@ -237,8 +237,37 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                 row_data = list()
                 for cell in row:
                     row_data.append(str(cell.value))
+
+                print(row_data)
+
                 excel_data.append(row_data)
 
+            emp_list_body={}
+
+
+            emp_list_head=list()
+            # emp_list_body=list()
+
+            row_count = 0
+            for row in excel_data:
+                i = 0
+
+                if row_count == 0:
+                    for cell in row:
+                        emp_list_head.append(cell)
+                        i+=1
+                else:
+                    emp={}
+                    for cell in row:
+                        emp[emp_list_head[i]]=cell
+                        i += 1
+                    emp_list_body[row_count]=emp
+                row_count+=1
+            print("emp_list_head")
+            print(emp_list_head)
+
+            print("emp_list_body")
+            print(emp_list_body)
 
             self.message_user(request, "Your csv file has been imported")
 

@@ -196,7 +196,6 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
         my_urls = [
             path('import-csv/', self.import_csv),
             path('import-excel/', self.import_excel),
-
         ]
         return my_urls + urls
 
@@ -268,7 +267,12 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
             print("emp_list_body")
             print(emp_list_body)
-
+            from .models import Job
+            row_count = 0
+            for row in emp_list_body:
+                job_id = Job.objects.get(name=row['name'])
+                emp =Employee(fullname=row['fullname'],job=job_id)
+                emp.save()
             self.message_user(request, "Your csv file has been imported")
 
 

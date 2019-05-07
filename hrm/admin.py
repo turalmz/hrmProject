@@ -78,7 +78,7 @@ class IsInsuranceFilter(admin.SimpleListFilter):
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name","last_name", "job","department")
+    list_display = ("first_name", "job","department")
     readonly_fields=('bank_account_len', 'social_insurance_len',)
     actions = ["export_as_csv"]
     list_per_page = 100
@@ -108,7 +108,7 @@ admin.site.register(Job)
 
 @admin.register(BankCardEmployee)
 class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name","last_name", "job","department")
+    list_display = ("first_name", "job","department")
     actions = ["export_as_csv"]
     list_per_page = 100
 
@@ -127,7 +127,7 @@ class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
 @admin.register(InsuranceEmployee)
 class InsuranceEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name","last_name", "job","department")
+    list_display = ("first_name", "job","department")
     actions = ["export_as_csv"]
     list_per_page = 100
 

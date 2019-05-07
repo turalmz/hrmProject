@@ -105,8 +105,6 @@ class Department(models.Model):
 
 class Employee(models.Model):
     first_name = models.CharField(max_length=100, verbose_name ='Ad')
-    mid_name = models.CharField(max_length=100,default="",blank=True, verbose_name ='Ata adı')
-    last_name = models.CharField(max_length=100, verbose_name ='Soyad')
     hire_date = models.DateField(_('hire date'))
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
@@ -501,8 +499,6 @@ class Holiday(models.Model):
 class InsuranceEmployee(models.Model):
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
     first_name = models.CharField(max_length=100, verbose_name ='Ad')
-    mid_name = models.CharField(max_length=100,default="",blank=True, verbose_name ='Ata adı')
-    last_name = models.CharField(max_length=100, verbose_name ='Soyad')
     hire_date = models.DateField(_('hire date'))
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
@@ -530,8 +526,6 @@ class InsuranceEmployee(models.Model):
         
     def save(self, *args, **kwargs):
         self.first_name = self.emp.first_name
-        self.mid_name = self.emp.mid_name
-        self.last_name = self.emp.last_name
         self.hire_date = self.emp.hire_date
         self.birth_date = self.emp.birth_date
         self.quit_date = self.emp.quit_date
@@ -550,8 +544,6 @@ class InsuranceEmployee(models.Model):
 class BankCardEmployee(models.Model):
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE, verbose_name=_('employee'),blank=True,default=0)
     first_name = models.CharField(max_length=100, verbose_name ='Ad')
-    mid_name = models.CharField(max_length=100,default="",blank=True, verbose_name ='Ata adı')
-    last_name = models.CharField(max_length=100, verbose_name ='Soyad')
     hire_date = models.DateField(_('hire date'))
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
@@ -580,8 +572,6 @@ class BankCardEmployee(models.Model):
         
     def save(self, *args, **kwargs):
         self.first_name = self.emp.first_name
-        self.mid_name = self.emp.mid_name
-        self.last_name = self.emp.last_name
         self.hire_date = self.emp.hire_date
         self.birth_date = self.emp.birth_date
         self.quit_date = self.emp.quit_date

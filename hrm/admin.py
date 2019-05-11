@@ -271,7 +271,12 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             row_count = 0
             for row in emp_list_body:
                 job_id = Job.objects.get(name=row['name'])
-                emp =Employee(fullname=row['fullname'],job=job_id)
+                emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],birth_date =row['birth_date'],
+                              quit_date=row['quit_date'],fin=row['fin'],
+                              passport =row['passport'],phone =row['phone'],
+                              home_phone=row['home_phone'],address =row['address'],
+                              department =row['department'],active =row['active'],
+                              ,job=Job.objects.first(pk=row['job_id']))
                 emp.save()
             self.message_user(request, "Your csv file has been imported")
 

@@ -95,6 +95,110 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
     is_insurance.boolean = True
 
+    change_list_template = "hrm/employee_changelist.html"
+
+    def get_urls(self):
+        urls = super().get_urls()
+        from django.urls import path
+
+        my_urls = [
+            path('import-csv/', self.import_csv),
+            path('import-excel/', self.import_excel),
+        ]
+        return my_urls + urls
+
+    def import_csv(self, request):
+        if request.method == "POST":
+            csv_file = request.FILES["csv_file"]
+            reader = csv.reader(csv_file)
+
+
+            self.message_user(request, "Your csv file has been imported")
+
+
+            return redirect("..")
+        form = CsvOrExcelImportForm()
+        payload = {"form": form}
+        return render(
+            request, "admin/csv_form.html", payload
+        )
+
+    def import_excel(self, request):
+        if request.method == "POST":
+            excel_file = request.FILES["excel_file"]
+            reader = csv.reader(excel_file)
+
+            import openpyxl
+            # you may put validations here to check extension or file size
+
+            wb = openpyxl.load_workbook(excel_file)
+
+            # getting a particular sheet by name out of many sheets
+            worksheet = wb["Sheet1"]
+            print(worksheet)
+
+            excel_data = list()
+            # iterating over the rows and
+            # getting value from each cell in row
+            for row in worksheet.iter_rows():
+                row_data = list()
+                for cell in row:
+                    row_data.append(str(cell.value))
+
+                print(row_data)
+
+                excel_data.append(row_data)
+
+            emp_list_body={}
+
+
+            emp_list_head=list()
+            # emp_list_body=list()
+
+            row_count = 0
+            for row in excel_data:
+                i = 0
+
+                if row_count == 0:
+                    for cell in row:
+                        emp_list_head.append(cell)
+                        i+=1
+                else:
+                    emp={}
+                    for cell in row:
+                        emp[emp_list_head[i]]=cell
+                        i += 1
+                    emp_list_body[row_count]=emp
+                row_count+=1
+            print("emp_list_head")
+            print(emp_list_head)
+
+            print("emp_list_body")
+            print(emp_list_body)
+            from .models import Job
+            row_count = 0
+            for row in emp_list_body:
+                job_id = Job.objects.first(name=row['job'])
+                emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],
+                              birth_date =row['birth_date'],quit_date=row['quit_date'],
+                              fin=row['fin'], passport =row['passport'],
+                              phone =row['phone'], home_phone=row['home_phone'],
+                              address =row['address'],department =row['department'],
+                              active =row['active'], job=job_id)
+                emp.save()
+            self.message_user(request, "Your csv file has been imported")
+
+
+            return redirect("..")
+
+
+        form = ExcelImportForm()
+        payload = {"form": form}
+        return render(
+            request, "admin/excel_form.html", payload
+        )
+
+
 
 def has_add_permission(self, request):
     return False
@@ -271,12 +375,12 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             row_count = 0
             for row in emp_list_body:
                 job_id = Job.objects.get(name=row['name'])
-                emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],birth_date =row['birth_date'],
-                              quit_date=row['quit_date'],fin=row['fin'],
-                              passport =row['passport'],phone =row['phone'],
-                              home_phone=row['home_phone'],address =row['address'],
-                              department =row['department'],active =row['active'],
-                              ,job=Job.objects.first(pk=row['job_id']))
+                emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],
+                              birth_date =row['birth_date'],quit_date=row['quit_date'],
+                              fin=row['fin'], passport =row['passport'],
+                              phone =row['phone'], home_phone=row['home_phone'],
+                              address =row['address'],department =row['department'],
+                              active =row['active'], job=job_id)
                 emp.save()
             self.message_user(request, "Your csv file has been imported")
 

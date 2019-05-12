@@ -135,7 +135,7 @@ class Employee(models.Model):
      )
 
     def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
+        return "{}".format(self.first_name)
 
     def __repr__(self):
         return self.__str__()
@@ -518,7 +518,7 @@ class InsuranceEmployee(models.Model):
     give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
     
     def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
+        return "{}".format(self.first_name)
 
     class Meta:
         verbose_name = _('Sığorta İşçi')
@@ -563,7 +563,7 @@ class BankCardEmployee(models.Model):
     give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
 
     def __str__(self):
-        return "{} {}".format(self.first_name, self.last_name)
+        return "{}".format(self.first_name)
 
     class Meta:
         verbose_name = _('Bank İşçi')

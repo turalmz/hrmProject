@@ -168,7 +168,7 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                     for cell in row:
                         emp[emp_list_head[i]]=cell
                         i += 1
-                    emp_list_body[row_count]=emp
+                    emp_list_body[str(row_count)]=emp
                 row_count+=1
             print("emp_list_head")
             print(emp_list_head)
@@ -177,15 +177,29 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             print(emp_list_body)
             from .models import Job
             row_count = 0
-            for row in emp_list_body:
-                job_id = Job.objects.first(name=row['job'])
+
+            print(type(emp_list_body))
+            for key,value in emp_list_body.items():
+
+                print(key)
+
+                print(type(value))
+                row = value
+                job_id = Job.objects.get(name=value['job'])
+                print(job_id)
+                import datetime
+
+                date_time_str = '2018-06-29 08:15:27.243860'
+                date_time_obj = datetime.datetime.strptime(date_time_str, '%Y/%m/%d')
+
                 emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],
                               birth_date =row['birth_date'],quit_date=row['quit_date'],
                               fin=row['fin'], passport =row['passport'],
                               phone =row['phone'], home_phone=row['home_phone'],
-                              address =row['address'],department =row['department'],
+                              address =row['address'],#department =row['department'],
                               active =row['active'], job=job_id)
                 emp.save()
+                row_count += 1
             self.message_user(request, "Your csv file has been imported")
 
 
@@ -374,7 +388,7 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             from .models import Job
             row_count = 0
             for row in emp_list_body:
-                job_id = Job.objects.get(name=row['name'])
+                job_id = Job.objects.get(name=row['name']).pk
                 emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],
                               birth_date =row['birth_date'],quit_date=row['quit_date'],
                               fin=row['fin'], passport =row['passport'],

@@ -104,7 +104,7 @@ class Department(models.Model):
 
 
 class Employee(models.Model):
-    first_name = models.CharField(max_length=100, verbose_name ='Ad')
+    first_name = models.CharField(max_length=100, verbose_name ='Ad',primary_key=True)
     hire_date = models.DateField(_('hire date'))
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
@@ -116,7 +116,7 @@ class Employee(models.Model):
     home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
     address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, db_column='dept_no', verbose_name=_('department'),blank=True,default=0)
-    manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
+    # manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
     bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
     social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
@@ -140,11 +140,6 @@ class Employee(models.Model):
     def __repr__(self):
         return self.__str__()
 
-    def save(self, *args, **kwargs):
-         self.bank_account_len = len(self.bank_account)
-         self.social_insurance_len = len(self.social_insurance)
-
-         return super(Employee, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = _('İşçi')

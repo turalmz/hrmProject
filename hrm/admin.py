@@ -6,6 +6,8 @@ from django import forms
 from django.shortcuts import redirect
 from django.shortcuts import render
 
+from django.conf.urls import include, url
+
 
 admin.site.site_header = "ERP Admin"
 admin.site.site_title = "ERP Admin Portal"
@@ -101,6 +103,7 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
         urls = super().get_urls()
         from django.urls import path
 
+
         my_urls = [
             path('import-csv/', self.import_csv),
             path('import-excel/', self.import_excel),
@@ -131,11 +134,14 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             import openpyxl
             # you may put validations here to check extension or file size
 
-            wb = openpyxl.load_workbook(excel_file)
 
+            wb = openpyxl.load_workbook(excel_file)
+            print(wb.iso_dates)
+            print(wb.excel_base_date)
             # getting a particular sheet by name out of many sheets
             worksheet = wb["Sheet1"]
             print(worksheet)
+
 
             excel_data = list()
             # iterating over the rows and
@@ -189,16 +195,22 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                 print(job_id)
                 import datetime
 
-                date_time_str = '2018-06-29 08:15:27.243860'
-                date_time_obj = datetime.datetime.strptime(date_time_str, '%Y/%m/%d')
+                date_time_str = '26/9/2018'
+                date_time_obj = datetime.datetime.strptime(date_time_str, '%d/%m/%Y')
+                print(date_time_obj)
+                # emp = Employee.objects.create(first_name=row['fullname'],hire_date =datetime.datetime.strptime(row['hire_date'], "%Y-%m-%d %H:%M:%S"),
+                #               birth_date =datetime.datetime.strptime(row['birth_date'], "%Y-%m-%d %H:%M:%S"),quit_date=datetime.datetime.strptime(row['quit_date'],"%Y-%m-%d %H:%M:%S"),
+                #               fin=row['fin'], passport =row['passport'],
+                #               phone =row['phone'], home_phone=row['home_phone'],
+                #               address =row['address'],#department =row['department'],
+                #               # active =row['active']
+                #               # , job=job_id
+                #               )
 
-                emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],
-                              birth_date =row['birth_date'],quit_date=row['quit_date'],
-                              fin=row['fin'], passport =row['passport'],
-                              phone =row['phone'], home_phone=row['home_phone'],
-                              address =row['address'],#department =row['department'],
-                              active =row['active'], job=job_id)
+                emp = Employee(first_name="alma",hire_date =datetime.datetime.strptime(row['hire_date'], "%Y-%m-%d %H:%M:%S"),
+                               birth_date =datetime.datetime.strptime(row['birth_date'], "%Y-%m-%d %H:%M:%S"),)
                 emp.save()
+                # emp.save()
                 row_count += 1
             self.message_user(request, "Your csv file has been imported")
 
@@ -288,7 +300,7 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                     "day_20","day_21","day_22","day_23","day_24","day_25","day_26","day_27","day_28","day_29",
                     "day_30", "day_31",)
 
-    change_list_template = "hrm/employee_changelist.html"
+
 
     list_filter = ("month","emp__job")
     actions = ["export_as_csv"]
@@ -306,108 +318,6 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
         css = {
              'all': ('css/script.css',)
         }
-
-    def get_urls(self):
-        urls = super().get_urls()
-        from django.urls import path
-
-        my_urls = [
-            path('import-csv/', self.import_csv),
-            path('import-excel/', self.import_excel),
-        ]
-        return my_urls + urls
-
-    def import_csv(self, request):
-        if request.method == "POST":
-            csv_file = request.FILES["csv_file"]
-            reader = csv.reader(csv_file)
-
-
-            self.message_user(request, "Your csv file has been imported")
-
-
-            return redirect("..")
-        form = CsvOrExcelImportForm()
-        payload = {"form": form}
-        return render(
-            request, "admin/csv_form.html", payload
-        )
-
-    def import_excel(self, request):
-        if request.method == "POST":
-            excel_file = request.FILES["excel_file"]
-            reader = csv.reader(excel_file)
-
-            import openpyxl
-            # you may put validations here to check extension or file size
-
-            wb = openpyxl.load_workbook(excel_file)
-
-            # getting a particular sheet by name out of many sheets
-            worksheet = wb["Sheet1"]
-            print(worksheet)
-
-            excel_data = list()
-            # iterating over the rows and
-            # getting value from each cell in row
-            for row in worksheet.iter_rows():
-                row_data = list()
-                for cell in row:
-                    row_data.append(str(cell.value))
-
-                print(row_data)
-
-                excel_data.append(row_data)
-
-            emp_list_body={}
-
-
-            emp_list_head=list()
-            # emp_list_body=list()
-
-            row_count = 0
-            for row in excel_data:
-                i = 0
-
-                if row_count == 0:
-                    for cell in row:
-                        emp_list_head.append(cell)
-                        i+=1
-                else:
-                    emp={}
-                    for cell in row:
-                        emp[emp_list_head[i]]=cell
-                        i += 1
-                    emp_list_body[row_count]=emp
-                row_count+=1
-            print("emp_list_head")
-            print(emp_list_head)
-
-            print("emp_list_body")
-            print(emp_list_body)
-            from .models import Job
-            row_count = 0
-            for row in emp_list_body:
-                job_id = Job.objects.get(name=row['name']).pk
-                emp =Employee(first_name=row['fullname'],hire_date =row['hire_date'],
-                              birth_date =row['birth_date'],quit_date=row['quit_date'],
-                              fin=row['fin'], passport =row['passport'],
-                              phone =row['phone'], home_phone=row['home_phone'],
-                              address =row['address'],department =row['department'],
-                              active =row['active'], job=job_id)
-                emp.save()
-            self.message_user(request, "Your csv file has been imported")
-
-
-            return redirect("..")
-
-
-        form = ExcelImportForm()
-        payload = {"form": form}
-        return render(
-            request, "admin/excel_form.html", payload
-        )
-
 
 
 from django.dispatch import receiver

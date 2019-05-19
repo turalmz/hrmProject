@@ -60,32 +60,34 @@ class IsCardFilter(admin.SimpleListFilter):
         return queryset
 
 
-class IsInsuranceFilter(admin.SimpleListFilter):
-    title = 'has insurance'
-    parameter_name = 'is_insurance'
-
-    def lookups(self, request, model_admin):
-        return (
-            ('Yes', 'Yes'),
-            ('No', 'No'),
-        )
-
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value == 'Yes':
-            return queryset.filter(social_insurance_len=20)
-        elif value == 'No':
-            return queryset.exclude(social_insurance_len=20)
-        return queryset
+# class IsInsuranceFilter(admin.SimpleListFilter):
+#     title = 'has insurance'
+#     parameter_name = 'is_insurance'
+#
+#     def lookups(self, request, model_admin):
+#         return (
+#             ('Yes', 'Yes'),
+#             ('No', 'No'),
+#         )
+#
+#     def queryset(self, request, queryset):
+#         value = self.value()
+#         if value == 'Yes':
+#             return queryset.filter(social_insurance_len=20)
+#         elif value == 'No':
+#             return queryset.exclude(social_insurance_len=20)
+#         return queryset
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name", "job","department")
+    # list_display = ("first_name", "job","department")
+    list_display = ("first_name",)
     readonly_fields=('bank_account_len', 'social_insurance_len',)
     actions = ["export_as_csv"]
     list_per_page = 100
 
-    list_filter = ("department","job",IsInsuranceFilter,IsCardFilter)
+    # list_filter = (IsCardFilter,)
+    # list_filter = ("department","job",IsCardFilter)
 
     def is_card(self, obj):
         return obj.bank_account_len == 16
@@ -185,6 +187,8 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             row_count = 0
 
             print(type(emp_list_body))
+            p = Person(first_name="ali", last_name='veliev')
+            p.save()
             for key,value in emp_list_body.items():
 
                 print(key)
@@ -195,22 +199,74 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                 print(job_id)
                 import datetime
 
-                date_time_str = '26/9/2018'
-                date_time_obj = datetime.datetime.strptime(date_time_str, '%d/%m/%Y')
-                print(date_time_obj)
-                # emp = Employee.objects.create(first_name=row['fullname'],hire_date =datetime.datetime.strptime(row['hire_date'], "%Y-%m-%d %H:%M:%S"),
-                #               birth_date =datetime.datetime.strptime(row['birth_date'], "%Y-%m-%d %H:%M:%S"),quit_date=datetime.datetime.strptime(row['quit_date'],"%Y-%m-%d %H:%M:%S"),
-                #               fin=row['fin'], passport =row['passport'],
-                #               phone =row['phone'], home_phone=row['home_phone'],
-                #               address =row['address'],#department =row['department'],
-                #               # active =row['active']
-                #               # , job=job_id
-                #               )
 
-                emp = Employee(first_name="alma",hire_date =datetime.datetime.strptime(row['hire_date'], "%Y-%m-%d %H:%M:%S"),
-                               birth_date =datetime.datetime.strptime(row['birth_date'], "%Y-%m-%d %H:%M:%S"),)
+                emp = Employee( first_name=row['fullname'],
+                    hire_date=datetime.datetime.strptime(row['hire_date'], "%Y-%m-%d %H:%M:%S"),
+                    birth_date=datetime.datetime.strptime(row['birth_date'], "%Y-%m-%d %H:%M:%S"),
+                )
+
+                try:
+                    emp.phone =row['phone']
+                except:
+                    pass
+
+                try:
+                    emp.home_phone = row['home_phone']
+                except:
+                    pass
+
+                try:
+                    emp.fin = row['fin']
+                except:
+                    pass
+
+                try:
+                    emp.passport = row['passport']
+                except:
+                    pass
+
+                try:
+                    emp.address = row['address']
+                except:
+                    pass
+
+                try:
+                    if row['active']==1:
+                        emp.active = True
+                    elif row['active'] == 'OK':
+                        emp.active = True
+                    elif row['active']=='1':
+                        emp.active = True
+                    elif row['active']=='ok':
+                        emp.active = True
+                    elif row['active'] == 'active':
+                        emp.active = True
+                    elif row['active']=='aktiv':
+                        emp.active = True
+                    elif row['active']=='Aktiv':
+                        emp.active = True
+                    else:
+                        emp.active = False
+                except:
+                    pass
+
+
+                try:
+                    emp.job = Job.objects.filter(name=value['job'])[:1].get()
+                except:
+                    pass
+
+                try:
+                    emp.department=Department.objects.filter(name=value['department'])[:1].get()
+                except:
+                    pass
+                try:
+                    emp.quit_date = datetime.datetime.strptime(row['quit_date'], "%Y-%m-%d %H:%M:%S")
+                except:
+                    pass
+
                 emp.save()
-                # emp.save()
+
                 row_count += 1
             self.message_user(request, "Your csv file has been imported")
 
@@ -242,7 +298,7 @@ class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
     actions = ["export_as_csv"]
     list_per_page = 100
 
-    list_filter = ("department","job",IsInsuranceFilter,IsCardFilter)
+    list_filter = ("department","job",IsCardFilter)
 
     def is_card(self, obj):
         return obj.bank_account_len == 16
@@ -261,7 +317,7 @@ class InsuranceEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
     actions = ["export_as_csv"]
     list_per_page = 100
 
-    list_filter = ("department","job",IsInsuranceFilter,IsCardFilter)
+    list_filter = ("department","job",IsCardFilter)
 
     def is_card(self, obj):
         return obj.bank_account_len == 16
@@ -302,7 +358,7 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
 
 
-    list_filter = ("month","emp__job")
+    # list_filter = ("month","emp__job")
     actions = ["export_as_csv"]
 
     readonly_fields=('hours','salary' )
@@ -338,7 +394,7 @@ def save_emp1(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Employee)
 def save_emp2(sender, instance, **kwargs):
-    if instance.insurance == True:
+    if instance.give_insurance_account == True:
         if InsuranceEmployee.objects.filter(emp=instance).exists():
             pass
         else:

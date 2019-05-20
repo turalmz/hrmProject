@@ -24,80 +24,60 @@ class ExcelImportForm(forms.Form):
 
 class ExportCsvMixin():
     def export_as_csv(self, request, queryset):
-        # help(self)
         meta = self.model._meta
         field_names = [field.name for field in meta.fields]
 
         response = HttpResponse(content_type='text/csv')
+
         response['Content-Disposition'] = 'attachment; filename={}.csv'.format(meta)
+        response.write(u'\ufeff'.encode('utf8'))
+        # writer = csv.writer(response, delimiter=';', dialect='excel')
+
         writer = csv.writer(response)
 
         writer.writerow(field_names)
         for obj in queryset:
-            row = writer.writerow([getattr(obj, field) for field in field_names])
+            row = writer.writerow([(getattr(obj, field)) for field in field_names])
 
         return response
 
-    export_as_csv.short_description = "Export Selected"
+    export_as_csv.short_description = "Export to Csv Selected"
 
 
-class IsCardFilter(admin.SimpleListFilter):
-    title = 'has card'
-    parameter_name = 'is_card'
 
-    def lookups(self, request, model_admin):
-        return (
-            ('Yes', 'Yes'),
-            ('No', 'No'),
-        )
+    def export_users_csv(self,request,queryset):
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="Report.csv"'
 
-    def queryset(self, request, queryset):
-        value = self.value()
-        if value == 'Yes':
-            return queryset.filter(bank_account_len=16)
-        elif value == 'No':
-            return queryset.exclude(bank_account_len=16)
-        return queryset
+        # response = HttpResponse(content_type='application/vnd.ms-excel')
+        # response['Content-Disposition'] = 'attachment; filename=Report.xlsx'
 
+        response.write(u'\ufeff'.encode('utf8'))
 
-# class IsInsuranceFilter(admin.SimpleListFilter):
-#     title = 'has insurance'
-#     parameter_name = 'is_insurance'
-#
-#     def lookups(self, request, model_admin):
-#         return (
-#             ('Yes', 'Yes'),
-#             ('No', 'No'),
-#         )
-#
-#     def queryset(self, request, queryset):
-#         value = self.value()
-#         if value == 'Yes':
-#             return queryset.filter(social_insurance_len=20)
-#         elif value == 'No':
-#             return queryset.exclude(social_insurance_len=20)
-#         return queryset
+        writer = csv.writer(response)
+
+        meta = self.model._meta
+        field_names = [field.name for field in meta.fields]
+
+        writer.writerow(field_names)
+
+        for obj in queryset:
+            row = writer.writerow([(getattr(obj, field)) for field in field_names])
+
+        return response
+
+    export_users_csv.short_description = "Export to Excel Selected"
+
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    # list_display = ("first_name", "job","department")
-    list_display = ("first_name",)
-    readonly_fields=('bank_account_len', 'social_insurance_len',)
-    actions = ["export_as_csv"]
+    list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
+    # readonly_fields=('bank_account_len', 'social_insurance_len',)
+    actions = ["export_as_csv","export_users_csv"]
     list_per_page = 100
 
-    # list_filter = (IsCardFilter,)
-    # list_filter = ("department","job",IsCardFilter)
+    list_filter = ("department","job","give_bank_account","give_insurance_account")
 
-    def is_card(self, obj):
-        return obj.bank_account_len == 16
-
-    is_card.boolean = True
-
-    def is_insurance(self, obj):
-        return obj.social_insurance == 20
-
-    is_insurance.boolean = True
 
     change_list_template = "hrm/employee_changelist.html"
 
@@ -117,9 +97,7 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             csv_file = request.FILES["csv_file"]
             reader = csv.reader(csv_file)
 
-
             self.message_user(request, "Your csv file has been imported")
-
 
             return redirect("..")
         form = CsvOrExcelImportForm()
@@ -146,8 +124,6 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
 
             excel_data = list()
-            # iterating over the rows and
-            # getting value from each cell in row
             for row in worksheet.iter_rows():
                 row_data = list()
                 for cell in row:
@@ -161,7 +137,6 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
 
             emp_list_head=list()
-            # emp_list_body=list()
 
             row_count = 0
             for row in excel_data:
@@ -294,40 +269,21 @@ admin.site.register(Job)
 
 @admin.register(BankCardEmployee)
 class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name", "job","department")
+    list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
     actions = ["export_as_csv"]
     list_per_page = 100
 
-    list_filter = ("department","job",IsCardFilter)
+    list_filter = ("department","job","give_bank_account","give_insurance_account")
 
-    def is_card(self, obj):
-        return obj.bank_account_len == 16
-
-    is_card.boolean = True
-
-    def is_insurance(self, obj):
-        return obj.social_insurance == 20
-
-    is_insurance.boolean = True
 
 
 @admin.register(InsuranceEmployee)
 class InsuranceEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name", "job","department")
+    list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
     actions = ["export_as_csv"]
     list_per_page = 100
 
-    list_filter = ("department","job",IsCardFilter)
-
-    def is_card(self, obj):
-        return obj.bank_account_len == 16
-
-    is_card.boolean = True
-
-    def is_insurance(self, obj):
-        return obj.social_insurance == 20
-
-    is_insurance.boolean = True
+    list_filter = ("department","job","give_bank_account","give_insurance_account")
 
 
 @admin.register(Rest)
@@ -357,8 +313,6 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
                     "day_30", "day_31",)
 
 
-
-    # list_filter = ("month","emp__job")
     actions = ["export_as_csv"]
 
     readonly_fields=('hours','salary' )

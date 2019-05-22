@@ -371,9 +371,7 @@ class Rest(models.Model):
             sum_day = sum_day+relement.day
             print(relement.day)
         self.sum = sum_day
-        # for relement in rest_list:
-        #     sum_day = sum_day+relement.day
-        #     print(relement.day)
+
 
         return True
 

@@ -363,7 +363,9 @@ def save_emp2(sender, instance, **kwargs):
 def save_inemp(sender, instance, **kwargs):
     if Employee.objects.filter(pk=instance.emp.pk).exists():
         b = Employee.objects.first(pk=instance.emp.pk)
+        b.give_bank_account = instance.give_bank_account
         b.give_insurance_account = instance.give_insurance_account
+
         b.save()
         print('_added')
 
@@ -375,6 +377,8 @@ def save_baemp(sender, instance, **kwargs):
     if Employee.objects.filter(pk=instance.emp.pk).exists():
         b = Employee.objects.first(pk=instance.emp.pk)
         b.give_bank_account = instance.give_bank_account
+        b.give_insurance_account = instance.give_insurance_account
+
         b.save()
         print('_added')
 

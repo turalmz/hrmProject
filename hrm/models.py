@@ -109,13 +109,13 @@ class Employee(models.Model):
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
     salary = models.IntegerField(_('salary'),default=0)
-    fin = models.CharField(max_length=12,default="", blank=True, verbose_name ='Fin')
+    fin = models.CharField(max_length=7,default="", blank=True, verbose_name ='Fin')
     passport = models.CharField(max_length=12,default="", blank=True, verbose_name ='Passport nömrəsi')
     bank_account = models.CharField(max_length=16,default="not", blank=True, verbose_name ='Bank nömrəsi')
     phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
     home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
-    address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name ='Bank nömrəsi',blank=True,null=True)
+    address = models.CharField(max_length=200,default="", blank=True, verbose_name ='Ünvan')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name ='Şöbə',blank=True,null=True)
     # manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True, null=True,verbose_name ='İşi',)
     bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
@@ -184,7 +184,7 @@ class Month(models.Model):
 
     def last_day_of_month(self,year, mon):
         day, num_days = calendar.monthrange(year, mon)
-        return num_days
+        return num_days+1
 
     def get_weekends(self):
         import datetime
@@ -269,7 +269,8 @@ class MonthEmployee(models.Model):
     def get_day_hours(self):
         sum_day_hours=0.0
         for day in range(1, 31):
-            sum_day_hours = sum_day_hours+self.get_day_hour(day)
+            if get_hour(self,day):
+                sum_day_hours = sum_day_hours+self.get_day_hour(day)
 
         return sum_day_hours
 
@@ -502,8 +503,8 @@ class InsuranceEmployee(models.Model):
     phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
     home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
     address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name=_('department'),blank=True,default=0)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name ='Şöbə',blank=True,null=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True, null=True,verbose_name ='İşi',)
     social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
 
@@ -546,8 +547,8 @@ class BankCardEmployee(models.Model):
     phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
     home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
     address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE,  verbose_name=_('department'),blank=True,default=0)
-    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name ='Şöbə',blank=True,null=True)
+    job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True, null=True,verbose_name ='İşi',)
     social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
 

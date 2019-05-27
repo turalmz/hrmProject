@@ -104,26 +104,26 @@ class Department(models.Model):
 
 
 class Employee(models.Model):
-    first_name = models.CharField(max_length=100, verbose_name ='Ad',primary_key=True)
+    first_name = models.CharField(max_length=100, verbose_name='Ad',primary_key=True)
     hire_date = models.DateField(_('hire date'))
     birth_date = models.DateField(_('birthday'))
     quit_date = models.DateField(_('quit date'),blank=True, null=True)
     salary = models.IntegerField(_('salary'),default=0)
-    fin = models.CharField(max_length=12,default="", blank=True, verbose_name ='Fin')
-    passport = models.CharField(max_length=12,default="", blank=True, verbose_name ='Passport nömrəsi')
+    fin = models.CharField(max_length=12,default="", blank=True, verbose_name='Fin')
+    passport = models.CharField(max_length=12,default="", blank=True, verbose_name='Passport nömrəsi')
     bank_account = models.CharField(max_length=16,default="not", blank=True, verbose_name ='Bank nömrəsi')
-    phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Əl telefonu')
-    home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ev telefonu')
-    address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
-    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name ='Bank nömrəsi',blank=True,null=True)
+    phone = models.CharField(max_length=20,default="", blank=True, verbose_name='Əl telefonu')
+    home_phone = models.CharField(max_length=20,default="", blank=True, verbose_name='Ev telefonu')
+    address = models.CharField(max_length=20,default="", blank=True, verbose_name='Ünvan')
+    department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name='Bank nömrəsi',blank=True,null=True)
     # manager = models.ForeignKey('self', null=True, related_name='employee',on_delete=models.CASCADE, blank=True, verbose_name ='Meneceri')
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True, null=True,verbose_name ='İşi',)
-    bank_account_len = models.PositiveIntegerField(default=0, verbose_name ='Bank nömrəsi')
-    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
+    bank_account_len = models.PositiveIntegerField(default=0, verbose_name='Bank nömrəsi')
+    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name='SSN')
     social_insurance_len = models.PositiveIntegerField(default=0)
-    active = models.BooleanField(default=True, verbose_name ='hazırda bu müəssədə işləyirmi')
-    give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
-    give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
+    active = models.BooleanField(default=True, verbose_name='hazırda bu müəssədə işləyirmi')
+    give_bank_account = models.BooleanField(default=False, verbose_name='bank akkauntu verilibmi')
+    give_insurance_account = models.BooleanField(default=False, verbose_name='sığorta akkauntu verilibmi')
     day = models.IntegerField( default=5,validators=[MaxValueValidator(6),MinValueValidator(5)],choices=MONTH_CHOICES, verbose_name = 'İş rejimi')
 
     rest_days = models.IntegerField(
@@ -250,17 +250,16 @@ class MonthEmployee(models.Model):
     day_30 = models.BooleanField(default=False)
     day_31 = models.BooleanField(default=False)
 
-    rest = models.FloatField(null=True, blank=True, default=0 ,verbose_name = 'Bu ay ərzində alınan məzuniyyət')
+    rest = models.FloatField(null=True, blank=True, default=0 ,verbose_name='Məzuniyyətə görə hesablanan məbləğ')
 
-    salary = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin maaşı')
+    salary = models.FloatField(null=True, blank=True, default=None,verbose_name='İşçinin maaşı')
 
-    all_amount = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin maaşı(məzuniyyət daxil)')
+    all_amount = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin maaşı(məzuniyyət daxil)')
 
-    hours = models.FloatField(null=True, blank=True, default=None,verbose_name = 'Bu ay işçinin işlədiyi saat')
+    hours = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin işlədiyi saat')
 
 
     def get_weekday(self):
-
         return self.month.weekday
 
     def __str__(self):
@@ -338,8 +337,8 @@ class MonthEmployee(models.Model):
         return super(MonthEmployee, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name = _('Aylıq')
-        verbose_name_plural = _('Aylıqlar')
+        verbose_name = _('Əmək haqqı')
+        verbose_name_plural = _('Əmək haqqı')
 
 
 class Rest(models.Model):
@@ -504,7 +503,7 @@ class InsuranceEmployee(models.Model):
     address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
     department = models.ForeignKey(Department, on_delete=models.CASCADE, verbose_name=_('department'),blank=True,default=0)
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
-    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
+    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='SSN')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
 
     give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
@@ -548,7 +547,7 @@ class BankCardEmployee(models.Model):
     address = models.CharField(max_length=20,default="", blank=True, verbose_name ='Ünvan')
     department = models.ForeignKey(Department, on_delete=models.CASCADE,  verbose_name=_('department'),blank=True,default=0)
     job = models.ForeignKey(Job, on_delete=models.CASCADE,blank=True,default=0, verbose_name ='İşi')
-    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='Sığorta nömrısi')
+    social_insurance = models.CharField(max_length=20,default="", blank=True, verbose_name ='SSN')
     give_bank_account = models.BooleanField(default=False, verbose_name = 'bank akkauntu verilibmi')
 
     give_insurance_account = models.BooleanField(default=False, verbose_name = 'sığorta akkauntu verilibmi')
@@ -579,6 +578,20 @@ class BankCardEmployee(models.Model):
         return super(BankCardEmployee, self).save(*args, **kwargs)
 
 
-class Person(models.Model):
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
+class Common(models.Model):
+    mon = models.OneToOneField(MonthEmployee,to_field='id', on_delete=models.CASCADE,blank=True,default=0)
+    first_name = models.CharField(max_length=100, verbose_name ='Ad')
+
+    rest = models.FloatField(null=True, blank=True, default=0 ,verbose_name='Məzuniyyətə görə hesablanan məbləğ')
+
+    salary = models.FloatField(null=True, blank=True, default=None,verbose_name='İşçinin maaşı')
+
+    all_amount = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin maaşı(məzuniyyət daxil)')
+
+    hours = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin işlədiyi saat')
+
+    ss = models.FloatField(null=True, blank=True, default=None,verbose_name='SS')
+
+    un = models.FloatField(null=True, blank=True, default=None,verbose_name='işsizlik fon')
+
+    gv = models.FloatField(null=True, blank=True, default=None,verbose_name='g/v')

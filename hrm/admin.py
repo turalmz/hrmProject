@@ -72,7 +72,7 @@ class ExportCsvMixin():
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
     list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
-    # readonly_fields=('bank_account_len', 'social_insurance_len',)
+    readonly_fields=('bank_account_len', 'social_insurance_len',)
     actions = ["export_as_csv","export_users_csv"]
     list_per_page = 100
 
@@ -162,8 +162,7 @@ class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
             row_count = 0
 
             print(type(emp_list_body))
-            p = Person(first_name="ali", last_name='veliev')
-            p.save()
+
             for key,value in emp_list_body.items():
 
                 print(key)
@@ -361,8 +360,8 @@ def save_emp2(sender, instance, **kwargs):
 
 @receiver(post_save, sender=InsuranceEmployee)
 def save_inemp(sender, instance, **kwargs):
-    if Employee.objects.filter(pk=instance.emp.pk).exists():
-        b = Employee.objects.first(pk=instance.emp.pk)
+    if Employee.objects.filter(first_name=instance.emp.first_name).exists():
+        b = Employee.objects.filter(first_name=instance.emp.first_name)[:1].get()
         b.give_bank_account = instance.give_bank_account
         b.give_insurance_account = instance.give_insurance_account
 
@@ -374,8 +373,8 @@ def save_inemp(sender, instance, **kwargs):
 
 @receiver(post_save, sender=BankCardEmployee)
 def save_baemp(sender, instance, **kwargs):
-    if Employee.objects.filter(pk=instance.emp.pk).exists():
-        b = Employee.objects.first(pk=instance.emp.pk)
+    if Employee.objects.filter(first_name=instance.emp.first_name).exists():
+        b = Employee.objects.filter(first_name=instance.emp.first_name)[:1].get()
         b.give_bank_account = instance.give_bank_account
         b.give_insurance_account = instance.give_insurance_account
 

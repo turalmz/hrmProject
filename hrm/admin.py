@@ -382,3 +382,13 @@ def save_baemp(sender, instance, **kwargs):
         print('_added')
 
     print('_-----')
+
+    
+@receiver(post_save, sender=MonthEmployee)
+def save_baemp(sender, instance, **kwargs):
+    if Common.objects.filter(mon=instance.id).exists():
+        b = Common.objects.filter(mon=instance.id)[:1].get()
+        b.save()
+        print('_added')
+
+    print('_-----')

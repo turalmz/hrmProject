@@ -266,23 +266,23 @@ admin.site.register(Department)
 admin.site.register(Job)
 
 
-@admin.register(BankCardEmployee)
-class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
-    actions = ["export_as_csv"]
-    list_per_page = 100
-
-    list_filter = ("department","job","give_bank_account","give_insurance_account")
-
-
-
-@admin.register(InsuranceEmployee)
-class InsuranceEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
-    actions = ["export_as_csv"]
-    list_per_page = 100
-
-    list_filter = ("department","job","give_bank_account","give_insurance_account")
+# @admin.register(BankCardEmployee)
+# class BankCardEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
+#     list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
+#     actions = ["export_as_csv"]
+#     list_per_page = 100
+#
+#     list_filter = ("department","job","give_bank_account","give_insurance_account")
+#
+#
+#
+# @admin.register(InsuranceEmployee)
+# class InsuranceEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
+#     list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
+#     actions = ["export_as_csv"]
+#     list_per_page = 100
+#
+#     list_filter = ("department","job","give_bank_account","give_insurance_account")
 
 
 @admin.register(Rest)
@@ -290,6 +290,7 @@ class RestAdmin(admin.ModelAdmin,ExportCsvMixin):
     list_display = ("month", "emp","day","sum")
     readonly_fields = ('sum','year', )
 
+admin.site.register(Common)
 
 @admin.register(Month)
 class MonthAdmin(admin.ModelAdmin,ExportCsvMixin):
@@ -332,63 +333,85 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
-
-    
-@receiver(post_save, sender=Employee)
-def save_emp1(sender, instance, **kwargs):
-    if instance.give_bank_account  == True:
-        if BankCardEmployee.objects.filter(emp=instance).exists():
-            pass
-        else:
-            b = BankCardEmployee(emp=instance)
-            b.save()
-            print('__added')
- 
-
-@receiver(post_save, sender=Employee)
-def save_emp2(sender, instance, **kwargs):
-    if instance.give_insurance_account == True:
-        if InsuranceEmployee.objects.filter(emp=instance).exists():
-            pass
-        else:
-            b = InsuranceEmployee(emp=instance)
-            b.save()
-            print('_added')
-        
-    print('_-----')
-
-
-@receiver(post_save, sender=InsuranceEmployee)
-def save_inemp(sender, instance, **kwargs):
-    if Employee.objects.filter(first_name=instance.emp.first_name).exists():
-        b = Employee.objects.filter(first_name=instance.emp.first_name)[:1].get()
-        b.give_bank_account = instance.give_bank_account
-        b.give_insurance_account = instance.give_insurance_account
-
-        b.save()
-        print('_added')
-
-    print('_-----')
-
-
-@receiver(post_save, sender=BankCardEmployee)
-def save_baemp(sender, instance, **kwargs):
-    if Employee.objects.filter(first_name=instance.emp.first_name).exists():
-        b = Employee.objects.filter(first_name=instance.emp.first_name)[:1].get()
-        b.give_bank_account = instance.give_bank_account
-        b.give_insurance_account = instance.give_insurance_account
-
-        b.save()
-        print('_added')
-
-    print('_-----')
-
+#
+#
+# @receiver(post_save, sender=Employee)
+# def save_emp1(sender, instance, **kwargs):
+#     if instance.give_bank_account  == True:
+#         if BankCardEmployee.objects.filter(emp=instance).exists():
+#             pass
+#         else:
+#             b = BankCardEmployee(emp=instance)
+#             b.save()
+#             print('__added')
+#
+#
+# @receiver(post_save, sender=Employee)
+# def save_emp2(sender, instance, **kwargs):
+#     if instance.give_insurance_account == True:
+#         if InsuranceEmployee.objects.filter(emp=instance).exists():
+#             pass
+#         else:
+#             b = InsuranceEmployee(emp=instance)
+#             b.save()
+#             print('_added')
+#
+#     print('_-----')
+#
+#
+# @receiver(post_save, sender=InsuranceEmployee)
+# def save_inemp(sender, instance, **kwargs):
+#     if Employee.objects.filter(first_name=instance.emp.first_name).exists():
+#         b = Employee.objects.filter(first_name=instance.emp.first_name)[:1].get()
+#         b.give_bank_account = instance.give_bank_account
+#         b.give_insurance_account = instance.give_insurance_account
+#
+#         b.save()
+#         print('_added')
+#
+#     print('_-----')
+#
+#
+# @receiver(post_save, sender=BankCardEmployee)
+# def save_baemp(sender, instance, **kwargs):
+#     if Employee.objects.filter(first_name=instance.emp.first_name).exists():
+#         b = Employee.objects.filter(first_name=instance.emp.first_name)[:1].get()
+#         b.give_bank_account = instance.give_bank_account
+#         b.give_insurance_account = instance.give_insurance_account
+#
+#         b.save()
+#         print('_added')
+#
+#     print('_-----')
+#
     
 @receiver(post_save, sender=MonthEmployee)
 def save_baemp(sender, instance, **kwargs):
-    if Common.objects.filter(mon=instance.id).exists():
-        b = Common.objects.filter(mon=instance.id)[:1].get()
+    if Common.objects.filter(mon=instance).exists():
+        b = Common.objects.filter(mon=instance)[:1].get()
+        b.mon = instance
+        b.first_name = instance.emp.first_name
+        b.rest = instance.rest
+        b.salary = instance.salary
+        b.all_amount = instance.all_amount
+        b.hours = instance.hours
+        b.ss = instance.ss
+        b.un = instance.un
+        b.gv = instance.gv
         b.save()
         print('_added')
+    else:
 
+        b = Common(mon = instance,first_name = instance.emp.first_name)
+
+        b.mon = instance
+        b.first_name = instance.emp.first_name
+        b.rest = instance.rest
+        b.salary = instance.salary
+        b.all_amount = instance.all_amount
+        b.hours = instance.hours
+        b.ss = instance.ss
+        b.un = instance.un
+        b.gv = instance.gv
+        b.save()
     print('_-----')

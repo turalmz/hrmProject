@@ -6,7 +6,6 @@ from django import forms
 from django.shortcuts import redirect
 from django.shortcuts import render
 
-from django.conf.urls import include, url
 
 
 admin.site.site_header = "ERP Admin"
@@ -262,7 +261,6 @@ def has_add_permission(self, request):
 
 
 admin.site.register(Department)
-# admin.site.register(Rest)
 admin.site.register(Job)
 
 
@@ -272,7 +270,14 @@ class RestAdmin(admin.ModelAdmin,ExportCsvMixin):
     list_display = ("month", "emp","day","sum")
     readonly_fields = ('sum','year', )
 
-admin.site.register(Common)
+# admin.site.register(Common)
+@admin.register(Common)
+class CommonAdmin(admin.ModelAdmin,ExportCsvMixin):
+    list_display = ('first_name','hours','salary', 'un','minus', 'gv','ss', 'total','all_amount')
+    actions = ["export_as_csv"]
+    list_per_page = 100
+    readonly_fields=('hours','salary', 'un','minus', 'gv','ss', 'total','all_amount')
+
 
 @admin.register(Month)
 class MonthAdmin(admin.ModelAdmin,ExportCsvMixin):
@@ -284,29 +289,35 @@ class MonthAdmin(admin.ModelAdmin,ExportCsvMixin):
 
 @admin.register(MonthEmployee)
 class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
-    list_display = ("month","get_weekday","job","emp","day_1","day_2","day_3","day_4","day_5","day_6","day_7","day_8","day_9",
+    list_display = ("month","get_weekday","job","emp","day","all","day_1","day_2","day_3","day_4","day_5","day_6","day_7","day_8","day_9",
                     "day_10","day_11","day_12","day_13","day_14","day_15","day_16","day_17","day_18","day_19",
                     "day_20","day_21","day_22","day_23","day_24","day_25","day_26","day_27","day_28","day_29",
                     "day_30", "day_31",)
 
-    list_editable = ("day_1","day_2","day_3","day_4","day_5","day_6","day_7","day_8","day_9",
+    list_editable = ("all","day_1","day_2","day_3","day_4","day_5","day_6","day_7","day_8","day_9",
                     "day_10","day_11","day_12","day_13","day_14","day_15","day_16","day_17","day_18","day_19",
                     "day_20","day_21","day_22","day_23","day_24","day_25","day_26","day_27","day_28","day_29",
                     "day_30", "day_31",)
 
+    readonly_fields=('hours','salary','ss', 'un','minus', 'gv', 'total','all_amount','all')
 
     actions = ["export_as_csv"]
 
-    readonly_fields=('hours','salary' )
 
     list_per_page = 100
 
     def job(self, obj):
         return obj.emp.job
 
+    def day(self, obj):
+        return obj.emp.day
 
     class Media:
-        js = ('js/script.js',)
+        js = (
+            # 'js/jquery-3.4.0.min.js',
+            'js/script.js',
+            # 'js/jq.js',
+        )
         css = {
              'all': ('css/script.css',)
         }

@@ -77,7 +77,72 @@ def get_hour(self,day):
     else:
         return 0
     
-    
+
+def set_hour(self,day):
+    if day==1:
+        self.day_1=self.all
+    elif day==2:
+        self.day_2=self.all
+    elif day==3:
+        self.day_3=self.all
+    elif day==4:
+        self.day_4=self.all
+    elif day==5:
+        self.day_5=self.all
+    elif day==6:
+        self.day_6=self.all
+    elif day==7:
+        self.day_7=self.all
+    elif day==8:
+        self.day_8=self.all
+    elif day==9:
+        self.day_9=self.all
+    elif day==10:
+        self.day_10=self.all
+    elif day==11:
+        self.day_11=self.all
+    elif day==12:
+        self.day_12=self.all
+    elif day==13:
+        self.day_13=self.all
+    elif day==14:
+        self.day_14=self.all
+    elif day==15:
+        self.day_15=self.all
+    elif day==16:
+        self.day_16=self.all
+    elif day==17:
+        self.day_17=self.all
+    elif day==18:
+        self.day_18=self.all
+    elif day==19:
+        self.day_19=self.all
+    elif day==20:
+        self.day_20=self.all
+    elif day==21:
+        self.day_21=self.all
+    elif day==22:
+        self.day_22=self.all
+    elif day==23:
+        self.day_23=self.all
+    elif day==24:
+        self.day_24=self.all
+    elif day==25:
+        self.day_25=self.all
+    elif day==26:
+        self.day_26=self.all
+    elif day==27:
+        self.day_27=self.all
+    elif day==28:
+        self.day_28=self.all
+    elif day==29:
+        self.day_29=self.all
+    elif day==30:
+        self.day_30=self.all
+    elif day==31:
+        self.day_31=self.all
+    else:
+        pass
 
 class Job(models.Model):
     name = models.CharField(_('name'), unique=True, max_length=40)
@@ -219,6 +284,7 @@ class Month(models.Model):
 class MonthEmployee(models.Model):
     month = models.ForeignKey(Month, on_delete=models.CASCADE,blank=True,default=0, verbose_name = 'Ay')
     emp = models.ForeignKey(Employee, on_delete=models.CASCADE,blank=True,default=0 ,verbose_name = 'İşçi')
+    all = models.BooleanField(default=False)
     day_1 = models.BooleanField(default=False)
     day_2 = models.BooleanField(default=False)
     day_3 = models.BooleanField(default=False)
@@ -281,8 +347,9 @@ class MonthEmployee(models.Model):
         for day in range(1, 31):
             if get_hour(self,day):
                 sum_day_hours = sum_day_hours+self.get_day_hour(day)
-
+        
         return sum_day_hours
+
 
 
     def is_sunday(self,day):
@@ -342,11 +409,29 @@ class MonthEmployee(models.Model):
 
         return sum_day_hours
 
+    def set_day_hours(self):
+        for day in range(1, 31):
+
+            if self.is_weekday(day):
+                set_hour(self, day)
+            elif self.is_saturday(day):
+                if self.emp.day == 6:
+                    set_hour(self, day)
+            else:
+                pass
+
     def save(self, *args, **kwargs):
+
+        self.set_day_hours()
+
+
         self.salary = (self.get_day_hours())*float(self.emp.salary/self.month.hours)
         self.hours = (self.get_day_hours())
         self.all_amount = float(self.salary)+float(self.rest)
-        self.ss = self.all_amount-200*3/100+(self.all_amount-200)*10
+        if(self.all_amount>=200):
+            self.ss = float(200*0.03)+float(self.all_amount-200)*0.1
+        else:
+            self.ss = float(self.all_amount*0.03)
         self.total = self.all_amount+self.ss
         return super(MonthEmployee, self).save(*args, **kwargs)
 

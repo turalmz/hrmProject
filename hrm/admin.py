@@ -5,7 +5,9 @@ from .models import *
 from django import forms
 from django.shortcuts import redirect
 from django.shortcuts import render
+from datetime import datetime, timedelta
 
+from excel_response import ExcelResponse
 
 
 admin.site.site_header = "ERP Admin"
@@ -42,7 +44,9 @@ class ExportCsvMixin():
 
     export_as_csv.short_description = "Export to Csv Selected"
 
+    def excelview(self,request,queryset):
 
+        return ExcelResponse(queryset)
 
     def export_users_csv(self,request,queryset):
         response = HttpResponse(content_type='text/csv')
@@ -72,7 +76,7 @@ class ExportCsvMixin():
 class EmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
     list_display = ("first_name", "job","department","give_bank_account","give_insurance_account")
     readonly_fields=('bank_account_len', 'social_insurance_len',)
-    actions = ["export_as_csv","export_users_csv"]
+    actions = ["export_as_csv","export_users_csv","excelview"]
     list_per_page = 100
 
     list_filter = ("department","job","give_bank_account","give_insurance_account")
@@ -259,7 +263,37 @@ def has_add_permission(self, request):
     return False
 
 
+class IsVeryBenevolentFilter(admin.SimpleListFilter):
+    title = 'işləyirmi'
+    parameter_name = 'işləyirmi'
 
+    def lookups(self, request, model_admin):
+        return (
+            ('Bəli', 'Bəli'),
+            ('Xeyir', 'Xeyir'),
+            ('Son ay', 'Son ay'),
+
+        )
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        import datetime
+
+        today = datetime.date.today()
+
+        if value == 'Son ay':
+            return queryset.filter(emp__hire_date__year=today.year, emp__hire_date__month=today.month)
+        elif value == 'Bəli':
+
+            return queryset.filter(emp__hire_date__gte=today).exclude(emp__hire_date__year=today.year).exclude( emp__hire_date__month=today.month)
+        elif value == 'Xeyir':
+            return queryset.exclude(emp__hire_date__lte=today, emp__hire_date__month=today.month)
+
+
+
+        return queryset
+
+admin.site.register(Holiday)
 admin.site.register(Department)
 admin.site.register(Job)
 
@@ -301,10 +335,18 @@ class MonthEmployeeAdmin(admin.ModelAdmin,ExportCsvMixin):
 
     readonly_fields=('hours','salary','ss', 'un','minus', 'gv', 'total','all_amount','all')
 
-    actions = ["export_as_csv"]
-
-
+    actions = ["export_as_csv","excelview"]
+    list_filter = (IsVeryBenevolentFilter,)
     list_per_page = 100
+
+    # def emp_works(self, obj):
+    #     today = datetime.date.today()
+    #     if(obj.emp.hire_date is None):
+    #         return "işləyir"
+    #     elif(obj.emp.hire_date>datetime.now() and (obj.emp.hire_date>datetime.now()- timedelta(months=-1))):
+    #         return "son ay"
+    #     else:
+    #         return "çıxıb"
 
     def job(self, obj):
         return obj.emp.job

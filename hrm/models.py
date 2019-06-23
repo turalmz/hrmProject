@@ -4,6 +4,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 import calendar
+from django import forms
 
 MONTH_CHOICES = (
     (5, "5"),
@@ -148,8 +149,8 @@ class Job(models.Model):
     name = models.CharField(_('name'), unique=True, max_length=40)
 
     class Meta:
-        verbose_name = _('İş')
-        verbose_name_plural = _('İşlər')
+        verbose_name = _('Vəzifə')
+        verbose_name_plural = _('Vəzifələr')
         db_table = 'jobs'
 
     def __str__(self):
@@ -208,8 +209,8 @@ class Employee(models.Model):
 
 
     class Meta:
-        verbose_name = _('İşçi')
-        verbose_name_plural = _('İşçilər')
+        verbose_name = _('Əməkdaş')
+        verbose_name_plural = _('Əməkdaşlar')
 
 
 class Month(models.Model):
@@ -243,7 +244,7 @@ class Month(models.Model):
         ], verbose_name = 'Aylıq iş norması'
      )
 
-    weekday = models.PositiveIntegerField(default=0, verbose_name = 'Ayın ilk günü həftənin hansı günüdür')
+    weekday = models.PositiveIntegerField(default=0, verbose_name='Ayın ilk günü həftənin hansı günüdür')
 
     def __str__(self):
         return "{} / {} / {}".format(self.month, self.year,self.last_day)
@@ -317,24 +318,27 @@ class MonthEmployee(models.Model):
     day_30 = models.BooleanField(default=False)
     day_31 = models.BooleanField(default=False)
 
-    rest = models.FloatField(null=True, blank=True, default=0 ,verbose_name='Məzuniyyətə görə hesablanan məbləğ')
+    rest = models.DecimalField(null=True, blank=True, default=0 ,verbose_name='Məzuniyyətə görə hesablanan məbləğ',max_digits=12,decimal_places=2)
 
-    salary = models.FloatField(null=True, blank=True, default=None,verbose_name='İşçinin maaşı')
+    salary = models.DecimalField(null=True, blank=True, default=None,verbose_name='İşçinin maaşı',max_digits=12,decimal_places=2)
 
-    all_amount = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin maaşı(məzuniyyət daxil)')
+    all_amount = models.DecimalField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin maaşı(məzuniyyət daxil)',max_digits=12,decimal_places=2)
 
-    hours = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin işlədiyi saat')
+    hours = models.DecimalField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin işlədiyi saat',max_digits=12,decimal_places=2)
 
 
-    ss = models.FloatField(null=True, blank=True, default=None,verbose_name='SS')
+    ss = models.DecimalField(null=True, blank=True, default=None,verbose_name='SS',max_digits=12,decimal_places=2)
 
-    un = models.FloatField(null=True, blank=True, default=None,verbose_name='işsizlik fon')
+    un = models.DecimalField(null=True, blank=True, default=None,verbose_name='işsizlik fon',max_digits=12,decimal_places=2)
 
-    gv = models.FloatField(null=True, blank=True, default=None,verbose_name='g/v')
+    gv = models.DecimalField(null=True, blank=True, default=None,verbose_name='g/v',max_digits=12,decimal_places=2)
 
-    minus = models.FloatField(null=True, blank=True, default=None,verbose_name='tutum cəmi')
+    minus = models.DecimalField(null=True, blank=True, default=None,verbose_name='tutum cəmi',max_digits=12,decimal_places=2)
 
-    total = models.FloatField(null=True, blank=True, default=None,verbose_name='total')
+    total = models.DecimalField(null=True, blank=True, default=None,verbose_name='total',max_digits=12,decimal_places=2)
+
+    created_date = models.DateTimeField(auto_now_add=True)
+
 
     def get_weekday(self):
         return self.month.weekday
@@ -476,6 +480,18 @@ class Rest(models.Model):
     def save(self, *args, **kwargs):
         self.year = self.month.year
         self.update_sum()
+        extra_money_sum = 0
+        mons = MonthEmployee.objects.filter(emp=self.emp).order_by('-created_date')[:7]
+        i = 0
+        for melement in mons:
+            i = i+1
+            if( i <= 6 ):
+                extra_money_sum += melement.total
+
+        if self.emp.day==5:
+            self.extra_money = extra_money_sum / 6 /self.month.hours*self.day*8
+        else:
+            self.extra_money = extra_money_sum / 6 /self.month.hours*self.day*7
         rest_list = Rest.objects.filter(emp=self.emp).filter(month__year=self.year).update()
         return super(Rest, self).save(*args, **kwargs)
 
@@ -594,24 +610,24 @@ class Common(models.Model):
 
     first_name = models.CharField(null=True, blank=True,max_length=100, verbose_name ='Ad')
 
-    rest = models.FloatField(null=True, blank=True, default=0 ,verbose_name='Məzuniyyətə görə hesablanan məbləğ')
+    rest = models.DecimalField(null=True, blank=True, default=0 ,verbose_name='Məzuniyyətə görə hesablanan məbləğ',max_digits=12,decimal_places=2)
 
-    salary = models.FloatField(null=True, blank=True, default=None,verbose_name='İşçinin maaşı')
+    salary = models.DecimalField(null=True, blank=True, default=None,verbose_name='İşçinin maaşı',max_digits=12,decimal_places=2)
 
-    all_amount = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin maaşı(məzuniyyət daxil)')
+    all_amount = models.DecimalField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin maaşı(məzuniyyət daxil)',max_digits=12,decimal_places=2)
 
-    hours = models.FloatField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin işlədiyi saat')
+    hours = models.DecimalField(null=True, blank=True, default=None,verbose_name='Bu ay işçinin işlədiyi saat',max_digits=12,decimal_places=2)
 
-    ss = models.FloatField(null=True, blank=True, default=None,verbose_name='SS')
+    ss = models.DecimalField(null=True, blank=True, default=None,verbose_name='SS',max_digits=12,decimal_places=2)
 
-    un = models.FloatField(null=True, blank=True, default=None,verbose_name='işsizlik fon')
+    un = models.DecimalField(null=True, blank=True, default=None,verbose_name='işsizlik fon',max_digits=12,decimal_places=2)
 
-    gv = models.FloatField(null=True, blank=True, default=None,verbose_name='g/v')
+    gv = models.DecimalField(null=True, blank=True, default=None,verbose_name='g/v',max_digits=12,decimal_places=2)
 
-    minus = models.FloatField(null=True, blank=True, default=None,verbose_name='tutum cəmi')
+    minus = models.DecimalField(null=True, blank=True, default=None,verbose_name='tutum cəmi',max_digits=12,decimal_places=2)
 
-    total = models.FloatField(null=True, blank=True, default=None,verbose_name='total')
+    total = models.DecimalField(null=True, blank=True, default=None,verbose_name='total',max_digits=12,decimal_places=2)
 
     class Meta:
-        verbose_name = _('Əmək haqqı hesabat')
-        verbose_name_plural = _('Əmək haqqı cəmi hesabat')
+        verbose_name = _('Əmək haqqı Hesabat')
+        verbose_name_plural = _('Əmək haqqı Hesabat')
